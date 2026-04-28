@@ -1,0 +1,16 @@
+[Unit]
+Description=Kalshi BTC 15-Minute Paper Bot
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/autoresearch
+EnvironmentFile=/home/ubuntu/autoresearch/.env
+ExecStart=/home/ubuntu/autoresearch/.venv/bin/python btc_bot.py --live --yes
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

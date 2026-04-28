@@ -1,0 +1,1386 @@
+diff --git a/.gitignore b/.gitignore
+index 436da4a..0cb3069 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -27,6 +27,7 @@ kalshi_private_key.pem
+ *.log
+ 
+ # Runtime state
++trades.db*
+ *.pid
+ *.tsv
+ *.json
+diff --git a/README.md b/README.md
+index 8e896e1..1eb2244 100644
+--- a/README.md
++++ b/README.md
+@@ -2,6 +2,42 @@
+ 
+ ![teaser](progress.png)
+ 
++## Kalshi BTC 15-Minute Bot
++
++This branch includes a BTC 15-minute Kalshi bot focused on `KXBTC15M` up/down markets. It evaluates each live 15-minute contract, prices it with a log-normal BTC model, and opens paper positions only when edge, confidence, spread, feed freshness, and risk gates pass.
++
++Run paper trading against live Kalshi markets:
++
++```bash
++uv run btc_bot.py --live --yes
++```
++
++Run a one-tick smoke test:
++
++```bash
++uv run btc_bot.py --live --yes --max-ticks 1
++```
++
++Check the 48-hour paper warmup and paper-trading stats:
++
++```bash
++uv run btc_bot.py --live --status
++```
++
++Real orders are blocked unless all gates pass:
++
++- `--live`
++- `--execute-live-orders`
++- `KALSHI_BTC_ENABLE_REAL_ORDERS=true`
++- no `PAUSED` file
++- at least 48 hours since the first paper run
++
++```bash
++KALSHI_BTC_ENABLE_REAL_ORDERS=true uv run btc_bot.py --live --yes --execute-live-orders
++```
++
++Without `--execute-live-orders`, `--live` means live market data with paper trades only.
++
+ *One day, frontier AI research used to be done by meat computers in between eating, sleeping, having other fun, and synchronizing once in a while using sound wave interconnect in the ritual of "group meeting". That era is long gone. Research is now entirely the domain of autonomous swarms of AI agents running across compute cluster megastructures in the skies. The agents claim that we are now in the 10,205th generation of the code base, in any case no one could tell if that's right or wrong as the "code" is now a self-modifying binary that has grown beyond human comprehension. This repo is the story of how it all began. -@karpathy, March 2026*.
+ 
+ The idea: give an AI agent a small but real LLM training setup and let it experiment autonomously overnight. It modifies the code, trains for 5 minutes, checks if the result improved, keeps or discards, and repeats. You wake up in the morning to a log of experiments and (hopefully) a better model. The training code here is a simplified single-GPU implementation of [nanochat](https://github.com/karpathy/nanochat). The core idea is that you're not touching any of the Python files like you normally would as a researcher. Instead, you are programming the `program.md` Markdown files that provide context to the AI agents and set up your autonomous research org. The default `program.md` in this repo is intentionally kept as a bare bones baseline, though it's obvious how one would iterate on it over time to find the "research org code" that achieves the fastest research progress, how you'd add more agents to the mix, etc. A bit more context on this project is here in this [tweet](https://x.com/karpathy/status/2029701092347630069).
+diff --git a/btc_bot.py b/btc_bot.py
+index dbcec78..d293a1e 100644
+--- a/btc_bot.py
++++ b/btc_bot.py
+@@ -9,18 +9,22 @@ Runs a fast loop (every 30s):
+ 4. Paper trade where edge exceeds threshold
+ 
+ Usage:
+-    uv run btc_bot.py --demo       # paper trading on demo
+-    uv run btc_bot.py --live       # paper trading on live (still paper — no real orders)
+-    uv run btc_bot.py --live --yes # headless mode
++    uv run btc_bot.py --live --yes                  # paper trade live BTC 15m markets
++    uv run btc_bot.py --live --status               # print 48h paper warmup status
++    KALSHI_BTC_ENABLE_REAL_ORDERS=true \
++      uv run btc_bot.py --live --yes --execute-live-orders
+ """
+ from __future__ import annotations
+ 
+ import argparse
++import json
+ import logging
++import os
+ import sqlite3
+ import sys
+ import time
+-from datetime import datetime, timezone
++from dataclasses import dataclass
++from datetime import datetime, timedelta, timezone
+ from typing import Optional
+ 
+ from infra import Env, KalshiClient
+@@ -28,8 +32,7 @@ from btc_feed import BTCFeed, FeedHealth
+ from btc_scanner import scan_btc_markets, BTCMarket, is_btc15_market
+ import btc_model
+ from btc_model import price_btc_contract, BTCEstimate
+-from execution import _get_db, _create_tables, open_paper_position
+-from signals import TradeSignal
++from execution import _get_db
+ from config import (
+     BTC_SCAN_INTERVAL_SEC,
+     BTC_MIN_EDGE,
+@@ -39,7 +42,8 @@ from config import (
+     BTC_MAX_DAILY_TRADES,
+     BTC_MAX_DAILY_LOSS,
+     BTC_MIN_TIME_REMAINING_SEC,
+-    INITIAL_BANKROLL,
++    BTC_PAPER_WARMUP_HOURS,
++    BTC_MAX_TARGET_DISTANCE,
+ )
+ 
+ logging.basicConfig(
+@@ -50,6 +54,42 @@ logging.basicConfig(
+ log = logging.getLogger("btc_bot")
+ 
+ 
++PAUSED_FILE = os.path.join(os.path.dirname(__file__), "PAUSED")
++LIVE_ACK_ENV = "KALSHI_BTC_ENABLE_REAL_ORDERS"
++
++
++@dataclass(frozen=True)
++class BTCExecutionConfig:
++    env: Env
++    live_orders_requested: bool = False
++
++
++@dataclass(frozen=True)
++class BTCWarmupStatus:
++    started_at: datetime
++    elapsed: timedelta
++    required: timedelta
++
++    @property
++    def complete(self) -> bool:
++        return self.elapsed >= self.required
++
++    @property
++    def hours_elapsed(self) -> float:
++        return self.elapsed.total_seconds() / 3600.0
++
++    @property
++    def hours_required(self) -> float:
++        return self.required.total_seconds() / 3600.0
++
++
++@dataclass(frozen=True)
++class BTCLiveGate:
++    allowed: bool
++    reason: str
++    warmup: BTCWarmupStatus
++
++
+ # ─── BTC risk state ─────────────────────────────────────────────────────────
+ 
+ def _ensure_btc_tables(db: sqlite3.Connection) -> None:
+@@ -84,6 +124,50 @@ def _ensure_btc_tables(db: sqlite3.Connection) -> None:
+             day_locked INTEGER NOT NULL DEFAULT 0,
+             updated_at TEXT NOT NULL
+         );
++
++        CREATE TABLE IF NOT EXISTS btc_runtime_state (
++            key TEXT PRIMARY KEY,
++            value TEXT NOT NULL,
++            updated_at TEXT NOT NULL
++        );
++
++        CREATE TABLE IF NOT EXISTS btc_market_evaluations (
++            id INTEGER PRIMARY KEY AUTOINCREMENT,
++            evaluated_at TEXT NOT NULL,
++            ticker TEXT NOT NULL,
++            side TEXT,
++            skip_reason TEXT,
++            btc_price REAL NOT NULL,
++            target_price REAL NOT NULL,
++            seconds_remaining REAL NOT NULL,
++            model_prob REAL NOT NULL,
++            confidence REAL NOT NULL,
++            yes_bid REAL,
++            yes_ask REAL,
++            no_bid REAL,
++            no_ask REAL,
++            edge_yes REAL,
++            edge_no REAL,
++            kalshi_spread REAL,
++            feed_health TEXT NOT NULL,
++            venue_spread_bps REAL,
++            paper_trade_opened INTEGER NOT NULL DEFAULT 0,
++            live_order_attempted INTEGER NOT NULL DEFAULT 0
++        );
++
++        CREATE TABLE IF NOT EXISTS btc_live_orders (
++            id INTEGER PRIMARY KEY AUTOINCREMENT,
++            paper_position_id INTEGER,
++            ticker TEXT NOT NULL,
++            side TEXT NOT NULL,
++            quantity INTEGER NOT NULL,
++            price_cents INTEGER NOT NULL,
++            max_cost_cents INTEGER NOT NULL,
++            order_id TEXT,
++            response_json TEXT,
++            status TEXT NOT NULL,
++            created_at TEXT NOT NULL
++        );
+     """)
+     db.commit()
+ 
+@@ -108,6 +192,101 @@ def _get_btc_daily_state(db: sqlite3.Connection, today: str) -> dict:
+     return dict(row)
+ 
+ 
++def _state_get(db: sqlite3.Connection, key: str) -> Optional[str]:
++    row = db.execute(
++        "SELECT value FROM btc_runtime_state WHERE key=?", (key,)
++    ).fetchone()
++    return str(row["value"]) if row else None
++
++
++def _state_set(db: sqlite3.Connection, key: str, value: str, now: datetime) -> None:
++    db.execute(
++        """
++        INSERT INTO btc_runtime_state (key, value, updated_at)
++        VALUES (?, ?, ?)
++        ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at
++        """,
++        (key, value, now.isoformat()),
++    )
++    db.commit()
++
++
++def _parse_state_datetime(value: str) -> datetime:
++    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
++    if parsed.tzinfo is None:
++        return parsed.replace(tzinfo=timezone.utc)
++    return parsed.astimezone(timezone.utc)
++
++
++def _get_or_start_btc_warmup(
++    db: sqlite3.Connection,
++    now: Optional[datetime] = None,
++) -> BTCWarmupStatus:
++    """Start or read the persistent 48-hour paper-trading warmup clock."""
++    _ensure_btc_tables(db)
++    current = now or datetime.now(timezone.utc)
++    raw_started = _state_get(db, "paper_warmup_started_at")
++    if raw_started:
++        started_at = _parse_state_datetime(raw_started)
++    else:
++        started_at = current
++        _state_set(db, "paper_warmup_started_at", started_at.isoformat(), current)
++    return BTCWarmupStatus(
++        started_at=started_at,
++        elapsed=max(current - started_at, timedelta(0)),
++        required=timedelta(hours=BTC_PAPER_WARMUP_HOURS),
++    )
++
++
++def _get_btc_warmup_status(
++    db: sqlite3.Connection,
++    now: Optional[datetime] = None,
++) -> Optional[BTCWarmupStatus]:
++    """Read warmup status without starting the clock."""
++    _ensure_btc_tables(db)
++    raw_started = _state_get(db, "paper_warmup_started_at")
++    if not raw_started:
++        return None
++    current = now or datetime.now(timezone.utc)
++    started_at = _parse_state_datetime(raw_started)
++    return BTCWarmupStatus(
++        started_at=started_at,
++        elapsed=max(current - started_at, timedelta(0)),
++        required=timedelta(hours=BTC_PAPER_WARMUP_HOURS),
++    )
++
++
++def _live_gate(
++    db: sqlite3.Connection,
++    execution: BTCExecutionConfig,
++    now: Optional[datetime] = None,
++) -> BTCLiveGate:
++    """Return whether a real order may be placed this tick."""
++    warmup = _get_or_start_btc_warmup(db, now=now)
++    if not execution.live_orders_requested:
++        return BTCLiveGate(False, "paper mode: live orders not requested", warmup)
++    if execution.env != Env.LIVE:
++        return BTCLiveGate(False, "live orders require --live", warmup)
++    if os.path.exists(PAUSED_FILE):
++        return BTCLiveGate(False, "PAUSED file present", warmup)
++    if os.environ.get(LIVE_ACK_ENV, "").strip().lower() != "true":
++        return BTCLiveGate(
++            False,
++            f"{LIVE_ACK_ENV}=true is required for real orders",
++            warmup,
++        )
++    if not warmup.complete:
++        return BTCLiveGate(
++            False,
++            (
++                f"paper warmup incomplete: "
++                f"{warmup.hours_elapsed:.1f}/{warmup.hours_required:.1f}h"
++            ),
++            warmup,
++        )
++    return BTCLiveGate(True, "live order gate passed", warmup)
++
++
+ def _record_btc_paper_trade(
+     db: sqlite3.Connection,
+     market: BTCMarket,
+@@ -123,7 +302,7 @@ def _record_btc_paper_trade(
+         return -1
+ 
+     # Size: fixed dollar risk per trade
+-    quantity = max(int(BTC_MAX_RISK_PER_TRADE / entry_price), 1)
++    quantity = _btc_trade_quantity(entry_price)
+     max_loss = quantity * entry_price
+ 
+     now = datetime.now(timezone.utc).isoformat()
+@@ -159,6 +338,159 @@ def _record_btc_paper_trade(
+     return cursor.lastrowid
+ 
+ 
++def _btc_trade_quantity(entry_price: float) -> int:
++    if entry_price <= 0:
++        return 0
++    return max(int(BTC_MAX_RISK_PER_TRADE / entry_price), 1)
++
++
++def _record_btc_evaluation(
++    db: sqlite3.Connection,
++    market: BTCMarket,
++    estimate: BTCEstimate,
++    side: Optional[str],
++    skip_reason: str,
++    edge_yes: Optional[float],
++    edge_no: Optional[float],
++    feed_health: FeedHealth,
++    venue_spread_bps: Optional[float],
++    paper_trade_opened: bool = False,
++    live_order_attempted: bool = False,
++) -> None:
++    _ensure_btc_tables(db)
++    db.execute(
++        """
++        INSERT INTO btc_market_evaluations
++            (evaluated_at, ticker, side, skip_reason, btc_price, target_price,
++             seconds_remaining, model_prob, confidence, yes_bid, yes_ask,
++             no_bid, no_ask, edge_yes, edge_no, kalshi_spread, feed_health,
++             venue_spread_bps, paper_trade_opened, live_order_attempted)
++        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
++        """,
++        (
++            datetime.now(timezone.utc).isoformat(),
++            market.ticker,
++            side,
++            skip_reason,
++            estimate.current_price,
++            estimate.target_price,
++            estimate.seconds_remaining,
++            estimate.prob_yes,
++            estimate.confidence,
++            market.yes_bid,
++            market.yes_ask,
++            market.no_bid,
++            market.no_ask,
++            edge_yes,
++            edge_no,
++            market.spread,
++            feed_health.value,
++            venue_spread_bps,
++            1 if paper_trade_opened else 0,
++            1 if live_order_attempted else 0,
++        ),
++    )
++    db.commit()
++
++
++def _record_btc_live_order(
++    db: sqlite3.Connection,
++    paper_position_id: int,
++    market: BTCMarket,
++    side: str,
++    quantity: int,
++    price_cents: int,
++    response: dict,
++    status: str,
++) -> int:
++    _ensure_btc_tables(db)
++    order = response.get("order", response) if isinstance(response, dict) else {}
++    order_id = order.get("order_id") or order.get("id")
++    cursor = db.execute(
++        """
++        INSERT INTO btc_live_orders
++            (paper_position_id, ticker, side, quantity, price_cents,
++             max_cost_cents, order_id, response_json, status, created_at)
++        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
++        """,
++        (
++            paper_position_id,
++            market.ticker,
++            side,
++            quantity,
++            price_cents,
++            quantity * price_cents,
++            order_id,
++            json.dumps(response, sort_keys=True),
++            status,
++            datetime.now(timezone.utc).isoformat(),
++        ),
++    )
++    db.commit()
++    return cursor.lastrowid
++
++
++def _maybe_place_live_order(
++    db: sqlite3.Connection,
++    client: KalshiClient,
++    market: BTCMarket,
++    side: str,
++    paper_position_id: int,
++    gate: BTCLiveGate,
++) -> bool:
++    """Place a real Kalshi order only after all explicit live gates pass."""
++    if not gate.allowed:
++        log.info("LIVE ORDER BLOCKED: %s", gate.reason)
++        return False
++
++    entry_price = market.yes_ask if side == "yes" else market.no_ask
++    if entry_price is None:
++        log.info("LIVE ORDER BLOCKED: missing %s ask", side)
++        return False
++
++    quantity = _btc_trade_quantity(entry_price)
++    if quantity <= 0:
++        log.info("LIVE ORDER BLOCKED: invalid quantity")
++        return False
++
++    price_cents = int(round(entry_price * 100))
++    try:
++        response = client.create_order(
++            ticker=market.ticker,
++            side=side,
++            contracts=quantity,
++            price_cents=price_cents,
++        )
++        _record_btc_live_order(
++            db=db,
++            paper_position_id=paper_position_id,
++            market=market,
++            side=side,
++            quantity=quantity,
++            price_cents=price_cents,
++            response=response,
++            status="submitted",
++        )
++        log.warning(
++            "BTC LIVE ORDER SUBMITTED: %s %s qty=%d price=%dc",
++            market.ticker, side.upper(), quantity, price_cents,
++        )
++        return True
++    except Exception as e:
++        _record_btc_live_order(
++            db=db,
++            paper_position_id=paper_position_id,
++            market=market,
++            side=side,
++            quantity=quantity,
++            price_cents=price_cents,
++            response={"error": str(e)},
++            status="error",
++        )
++        log.exception("BTC live order failed: %s", e)
++        return True
++
++
+ # ─── Signal generation ───────────────────────────────────────────────────────
+ 
+ def _generate_btc_signal(
+@@ -176,7 +508,7 @@ def _generate_btc_signal(
+     Trading gate (all must pass):
+       - feed health LIVE or DEGRADED (never STALE)
+       - venue spread <= 8 bps
+-      - model_edge >= 15%
++      - model_edge >= configured BTC_MIN_EDGE
+     """
+     # Feed health gate — never trade on stale data
+     if feed_health == FeedHealth.STALE:
+@@ -208,9 +540,8 @@ def _generate_btc_signal(
+     if estimate.confidence < BTC_MIN_CONFIDENCE:
+         return None, 0.0
+ 
+-    # Hard minimum: 15% edge until feed is proven trustworthy
+-    # Widen to 20% when feed is DEGRADED
+-    min_edge = 0.20 if feed_health == FeedHealth.DEGRADED else 0.15
++    # Require material edge; widen when feed quality is degraded.
++    min_edge = BTC_MIN_EDGE + 0.05 if feed_health == FeedHealth.DEGRADED else BTC_MIN_EDGE
+ 
+     # Edge calculation
+     edge_yes = estimate.prob_yes - market.yes_ask  # buy YES if model says higher
+@@ -310,7 +641,7 @@ def _settle_open_positions(db: sqlite3.Connection, client: KalshiClient) -> int:
+ 
+ # ─── Main tick ───────────────────────────────────────────────────────────────
+ 
+-def _tick(client: KalshiClient, feed: BTCFeed) -> None:
++def _tick(client: KalshiClient, feed: BTCFeed, execution: BTCExecutionConfig) -> None:
+     """One scan cycle for BTC 15-min markets."""
+     db = _get_db()
+     _ensure_btc_tables(db)
+@@ -344,10 +675,12 @@ def _tick(client: KalshiClient, feed: BTCFeed) -> None:
+         db.close()
+         return
+ 
++    gate = _live_gate(db, execution)
++
+     # Log feed snapshot
+     snap = feed.snapshot()
+     log.info(
+-        "FEED %s | fair=$%s mid=$%s last=$%s | spread=%.1fbps age=%.1fs | candles=%d",
++        "FEED %s | fair=$%s mid=$%s last=$%s | spread=%.1fbps age=%.1fs | candles=%d | warmup=%.1f/%.1fh live=%s",
+         snap["health"],
+         f"{snap['fair']:,.2f}" if snap["fair"] else "?",
+         f"{snap['mid']:,.2f}" if snap["mid"] else "?",
+@@ -355,6 +688,9 @@ def _tick(client: KalshiClient, feed: BTCFeed) -> None:
+         snap["spread_bps"] or 0,
+         snap["age_sec"] or 0,
+         snap["candle_count"],
++        gate.warmup.hours_elapsed,
++        gate.warmup.hours_required,
++        "allowed" if gate.allowed else gate.reason,
+     )
+ 
+     # Get held positions
+@@ -377,10 +713,13 @@ def _tick(client: KalshiClient, feed: BTCFeed) -> None:
+     recent_closes = feed.recent_closes()
+ 
+     for market in markets:
+-        # Near-the-money filter for 15-min markets
++        # Distance filter for 15-min markets. We still price/log the market,
++        # but do not trade when spot is too far from target.
+         distance = abs(price - market.target_price) / market.target_price if market.target_price else 999
+-        if is_btc15_market({"ticker": market.ticker}) and distance > 0.005:
+-            continue
++        too_far_from_target = (
++            is_btc15_market({"ticker": market.ticker})
++            and distance > BTC_MAX_TARGET_DISTANCE
++        )
+ 
+         # Price with model (V2: adaptive vol + momentum drift)
+         estimate = price_btc_contract(
+@@ -398,11 +737,14 @@ def _tick(client: KalshiClient, feed: BTCFeed) -> None:
+         edge_no = (1.0 - estimate.prob_yes) - market.no_ask if market.no_ask else None
+ 
+         # Check for signal — enforce feed health + spread gates
+-        side, edge = _generate_btc_signal(
+-            market, estimate, held, daily_state,
+-            feed_health=feed_state,
+-            venue_spread_bps=spread_bps,
+-        )
++        if too_far_from_target:
++            side, edge = None, 0.0
++        else:
++            side, edge = _generate_btc_signal(
++                market, estimate, held, daily_state,
++                feed_health=feed_state,
++                venue_spread_bps=spread_bps,
++            )
+ 
+         # Enhanced logging: log EVERY evaluated market with skip reason
+         skip_reason = ""
+@@ -417,6 +759,8 @@ def _tick(client: KalshiClient, feed: BTCFeed) -> None:
+                 skip_reason = f"KALSHI_SPREAD({market.spread:.3f})"
+             elif market.seconds_remaining < BTC_MIN_TIME_REMAINING_SEC:
+                 skip_reason = "TOO_CLOSE"
++            elif too_far_from_target:
++                skip_reason = f"FAR_FROM_TARGET({distance:.4f})"
+             elif estimate.confidence < BTC_MIN_CONFIDENCE:
+                 skip_reason = f"LOW_CONF({estimate.confidence:.2f})"
+             else:
+@@ -438,7 +782,21 @@ def _tick(client: KalshiClient, feed: BTCFeed) -> None:
+             f"SIGNAL:{side.upper()} edge={edge:.3f}" if side else f"SKIP:{skip_reason}",
+         )
+ 
++        paper_opened = False
++        live_attempted = False
++
+         if side is None:
++            _record_btc_evaluation(
++                db=db,
++                market=market,
++                estimate=estimate,
++                side=None,
++                skip_reason=skip_reason,
++                edge_yes=edge_yes,
++                edge_no=edge_no,
++                feed_health=feed_state,
++                venue_spread_bps=spread_bps,
++            )
+             continue
+ 
+         signals_found += 1
+@@ -446,6 +804,7 @@ def _tick(client: KalshiClient, feed: BTCFeed) -> None:
+         # Paper trade
+         pos_id = _record_btc_paper_trade(db, market, estimate, side, edge)
+         if pos_id > 0:
++            paper_opened = True
+             trades_opened += 1
+             log.info(
+                 "BTC PAPER TRADE: %s %s | btc=$%.2f target=$%.2f | "
+@@ -459,6 +818,28 @@ def _tick(client: KalshiClient, feed: BTCFeed) -> None:
+             )
+             # Refresh daily state after trade
+             daily_state = _get_btc_daily_state(db, today)
++            live_attempted = _maybe_place_live_order(
++                db=db,
++                client=client,
++                market=market,
++                side=side,
++                paper_position_id=pos_id,
++                gate=gate,
++            )
++
++        _record_btc_evaluation(
++            db=db,
++            market=market,
++            estimate=estimate,
++            side=side,
++            skip_reason="SIGNAL",
++            edge_yes=edge_yes,
++            edge_no=edge_no,
++            feed_health=feed_state,
++            venue_spread_bps=spread_bps,
++            paper_trade_opened=paper_opened,
++            live_order_attempted=live_attempted,
++        )
+ 
+     # Console summary
+     now_utc = datetime.now(timezone.utc).isoformat(timespec="seconds")
+@@ -490,7 +871,15 @@ def _tick(client: KalshiClient, feed: BTCFeed) -> None:
+ 
+ # ─── Entry point ─────────────────────────────────────────────────────────────
+ 
+-def run_loop(env: Env) -> None:
++def run_loop(
++    env: Env,
++    live_orders_requested: bool = False,
++    max_ticks: Optional[int] = None,
++) -> None:
++    execution = BTCExecutionConfig(
++        env=env,
++        live_orders_requested=live_orders_requested,
++    )
+     client = KalshiClient(env=env)
+ 
+     # Start price feed
+@@ -525,9 +914,14 @@ def run_loop(env: Env) -> None:
+     )
+ 
+     try:
++        ticks = 0
+         while True:
+             try:
+-                _tick(client, feed)
++                _tick(client, feed, execution)
++                ticks += 1
++                if max_ticks is not None and ticks >= max_ticks:
++                    log.info("Max ticks reached (%d); exiting", max_ticks)
++                    return
+                 time.sleep(BTC_SCAN_INTERVAL_SEC)
+             except KeyboardInterrupt:
+                 raise
+@@ -540,18 +934,94 @@ def run_loop(env: Env) -> None:
+         feed.stop()
+ 
+ 
++def print_status() -> None:
++    """Print paper warmup and BTC paper-trading stats."""
++    db = _get_db()
++    _ensure_btc_tables(db)
++    warmup = _get_btc_warmup_status(db)
++
++    settled = db.execute(
++        """
++        SELECT
++            COUNT(*) AS total,
++            SUM(CASE WHEN realized_pnl > 0 THEN 1 ELSE 0 END) AS wins,
++            SUM(CASE WHEN realized_pnl <= 0 THEN 1 ELSE 0 END) AS losses,
++            COALESCE(SUM(realized_pnl), 0) AS pnl
++        FROM btc_paper_positions
++        WHERE status='settled'
++        """
++    ).fetchone()
++    open_count = db.execute(
++        "SELECT COUNT(*) AS c FROM btc_paper_positions WHERE status='open'"
++    ).fetchone()["c"]
++    evaluations = db.execute(
++        "SELECT COUNT(*) AS c FROM btc_market_evaluations"
++    ).fetchone()["c"]
++    signals = db.execute(
++        "SELECT COUNT(*) AS c FROM btc_market_evaluations WHERE side IS NOT NULL"
++    ).fetchone()["c"]
++    live_orders = db.execute(
++        "SELECT COUNT(*) AS c FROM btc_live_orders"
++    ).fetchone()["c"]
++
++    if warmup is None:
++        print("paper_warmup_started_at=not_started")
++        print(f"paper_warmup_elapsed=0.00h/{BTC_PAPER_WARMUP_HOURS:.2f}h complete=False")
++    else:
++        print(f"paper_warmup_started_at={warmup.started_at.isoformat()}")
++        print(
++            f"paper_warmup_elapsed={warmup.hours_elapsed:.2f}h/"
++            f"{warmup.hours_required:.2f}h complete={warmup.complete}"
++        )
++    print(f"evaluations={evaluations} signals={signals}")
++    print(f"paper_open_positions={open_count}")
++    print(
++        "paper_settled="
++        f"{settled['total'] or 0} wins={settled['wins'] or 0} "
++        f"losses={settled['losses'] or 0} pnl=${settled['pnl'] or 0:.2f}"
++    )
++    print(f"live_orders_recorded={live_orders}")
++    db.close()
++
++
+ def main() -> None:
+     parser = argparse.ArgumentParser(
+-        description="Kalshi BTC 15-Minute Trading Bot (paper mode)",
++        description="Kalshi BTC 15-Minute Trading Bot",
+     )
+     group = parser.add_mutually_exclusive_group(required=True)
+     group.add_argument("--demo", action="store_true")
+     group.add_argument("--live", action="store_true")
+     parser.add_argument("--yes", action="store_true", help="Skip confirmation")
++    parser.add_argument("--status", action="store_true", help="Print BTC paper status and exit")
++    parser.add_argument("--max-ticks", type=int, default=None, help="Run N ticks, then exit")
++    parser.add_argument(
++        "--execute-live-orders",
++        action="store_true",
++        help=(
++            "Allow real orders only after the 48h paper warmup and "
++            f"{LIVE_ACK_ENV}=true. Without this flag, --live is still paper."
++        ),
++    )
+     args = parser.parse_args()
+ 
+     env = Env.LIVE if args.live else Env.DEMO
+-    if args.live and not args.yes:
++    if args.status:
++        print_status()
++        return
++
++    if args.execute_live_orders and not args.live:
++        parser.error("--execute-live-orders requires --live")
++
++    if args.execute_live_orders and not args.yes:
++        print("=" * 60)
++        print("BTC Bot — REAL ORDER MODE REQUESTED")
++        print("=" * 60)
++        print(f"Real orders still require 48h paper warmup and {LIVE_ACK_ENV}=true.")
++        confirm = input("Type 'YES LIVE BTC' to proceed: ")
++        if confirm.strip() != "YES LIVE BTC":
++            print("Aborted.")
++            sys.exit(0)
++    elif args.live and not args.yes:
+         print("=" * 60)
+         print("BTC Bot — LIVE environment (paper trades only)")
+         print("=" * 60)
+@@ -560,7 +1030,7 @@ def main() -> None:
+             print("Aborted.")
+             sys.exit(0)
+ 
+-    run_loop(env)
++    run_loop(env, live_orders_requested=args.execute_live_orders, max_ticks=args.max_ticks)
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/btc_scanner.py b/btc_scanner.py
+index cad603b..5c929df 100644
+--- a/btc_scanner.py
++++ b/btc_scanner.py
+@@ -8,20 +8,19 @@ from __future__ import annotations
+ 
+ import logging
+ import re
+-import time
+ from dataclasses import dataclass
+-from datetime import datetime, timezone
+-from typing import Optional
++from datetime import datetime, timedelta, timezone
++from typing import Any, Iterable, Optional
+ 
+ from infra import KalshiClient
+ from scanner import _parse_orderbook
++from config import BTC_SERIES_TICKER
+ 
+ log = logging.getLogger("btc_scanner")
+ 
+ # Known series tickers for BTC markets on Kalshi
+ BTC_SERIES_CANDIDATES = [
+-    "KXBTC15M",  # 15-minute rolling markets — primary target
+-    "KXBTCD",    # hourly/daily threshold markets
++    BTC_SERIES_TICKER,  # 15-minute rolling markets — primary target
+ ]
+ 
+ 
+@@ -49,6 +48,38 @@ class BTCMarket:
+     volume: int
+ 
+ 
++def _iter_nested_values(value: Any) -> Iterable[Any]:
++    """Yield primitive values from nested Kalshi strike payloads."""
++    if isinstance(value, dict):
++        for nested in value.values():
++            yield from _iter_nested_values(nested)
++    elif isinstance(value, (list, tuple)):
++        for nested in value:
++            yield from _iter_nested_values(nested)
++    else:
++        yield value
++
++
++def _coerce_target_price(value: Any) -> Optional[float]:
++    """Parse a BTC target price from numeric fields or strings."""
++    if value in (None, ""):
++        return None
++    if isinstance(value, (int, float)):
++        return float(value) if value > 0 else None
++    text = str(value)
++    if "TBD" in text.upper():
++        return None
++    for match in re.finditer(r'\$?([0-9][0-9,]*(?:\.\d+)?)', text):
++        try:
++            price = float(match.group(1).replace(",", ""))
++        except ValueError:
++            continue
++        # Reject incidental numbers like "15" from "15 mins".
++        if price >= 1000:
++            return price
++    return None
++
++
+ def _parse_target_price(title: str) -> Optional[float]:
+     """
+     Extract the target/reference price from a Kalshi BTC market title.
+@@ -58,15 +89,41 @@ def _parse_target_price(title: str) -> Optional[float]:
+         "Will Bitcoin be above $71,250 at ..."
+         "Bitcoin above $71,200.00"
+     """
+-    # Pattern: dollar amount with optional commas and decimals
+-    match = re.search(r'\$([0-9,]+(?:\.\d+)?)', title)
+-    if match:
+-        price_str = match.group(1).replace(",", "")
+-        try:
+-            return float(price_str)
+-        except ValueError:
+-            return None
+-    return None
++    return _coerce_target_price(title)
++
++
++def _extract_target_price(market: dict) -> Optional[float]:
++    """
++    Extract the "price to beat" from live Kalshi market payloads.
++
++    KXBTC15M markets are initialized with "Target price: TBD"; once the
++    contract opens, Kalshi may expose the numeric target in a strike field,
++    subtitle, title, or rules text. We try structured fields first and text last.
++    """
++    structured_values = [
++        market.get("floor_strike"),
++        market.get("functional_strike"),
++        market.get("expiration_value"),
++    ]
++    for value in structured_values:
++        price = _coerce_target_price(value)
++        if price is not None:
++            return price
++
++    for value in _iter_nested_values(market.get("custom_strike")):
++        price = _coerce_target_price(value)
++        if price is not None:
++            return price
++
++    text_fields = [
++        market.get("subtitle", ""),
++        market.get("yes_sub_title", ""),
++        market.get("no_sub_title", ""),
++        market.get("title", ""),
++        market.get("rules_primary", ""),
++        market.get("rules_secondary", ""),
++    ]
++    return _parse_target_price(" ".join(str(field) for field in text_fields))
+ 
+ 
+ def _parse_close_time(close_time_str: str) -> Optional[datetime]:
+@@ -145,22 +202,32 @@ def scan_btc_markets(client: KalshiClient) -> list[BTCMarket]:
+     found_markets: list[BTCMarket] = []
+     seen_tickers: set[str] = set()
+ 
+-    # Approach 1: Try series_ticker filter
++    # Approach 1: Try series_ticker filter in a close-time window around now.
++    # KXBTC15M has thousands of initialized future contracts; without the
++    # timestamp window, the current contract is often buried many pages deep.
+     for series in BTC_SERIES_CANDIDATES:
+         try:
+-            resp = client._request(
+-                "GET",
+-                f"/markets?status=open&limit=100&series_ticker={series}",
+-            )
++            if series == "KXBTC15M":
++                min_close = int((now - timedelta(minutes=1)).timestamp())
++                max_close = int((now + timedelta(minutes=25)).timestamp())
++                resp = _fetch_markets_by_series(
++                    client,
++                    series,
++                    min_close_ts=min_close,
++                    max_close_ts=max_close,
++                )
++            else:
++                resp = _fetch_markets_by_series(client, series, status="open", limit=200)
+             markets = resp.get("markets", [])
+             if series == "KXBTC15M":
+-                log.info("KXBTC15M query returned %d markets", len(markets))
++                log.info("KXBTC15M time-window query returned %d markets", len(markets))
+                 for m in markets[:3]:
+                     close = m.get("close_time", "")
+-                    strike = m.get("floor_strike", "?")
++                    strike = _extract_target_price(m) or "?"
+                     title = m.get("title", "")[:60]
+-                    log.info("  raw: %s | strike=%s | close=%s | title=%s",
+-                             m.get("ticker"), strike, close, title)
++                    subtitle = m.get("subtitle", "")[:60]
++                    log.info("  raw: %s | status=%s strike=%s | close=%s | title=%s | subtitle=%s",
++                             m.get("ticker"), m.get("status"), strike, close, title, subtitle)
+             for m in markets:
+                 t = m.get("ticker", "")
+                 if t not in seen_tickers:
+@@ -174,51 +241,8 @@ def scan_btc_markets(client: KalshiClient) -> list[BTCMarket]:
+         except Exception as e:
+             log.debug("Series %s fetch failed: %s", series, e)
+ 
+-    # Approach 2: Scan recent events for BTC
+-    if not found_markets:
+-        try:
+-            resp = client._request(
+-                "GET",
+-                "/events?status=open&limit=100&with_nested_markets=true",
+-            )
+-            for event in resp.get("events", []):
+-                et = (event.get("event_ticker", "") + event.get("title", "")).lower()
+-                if "btc" not in et and "bitcoin" not in et:
+-                    continue
+-                for m in event.get("markets", []):
+-                    t = m.get("ticker", "")
+-                    if t not in seen_tickers:
+-                        seen_tickers.add(t)
+-                        parsed = _parse_btc_market(m, now, client)
+-                        if parsed:
+-                            found_markets.append(parsed)
+-        except Exception as e:
+-            log.debug("Events scan failed: %s", e)
+-
+-    # Approach 3: Full market scan fallback (expensive, only if nothing found)
+-    if not found_markets:
+-        try:
+-            resp = client.get_markets(status="open", limit=1000, mve_filter="exclude")
+-            btc_raw = []
+-            for m in resp.get("markets", []):
+-                t = m.get("ticker", "")
+-                title = (m.get("title", "") + " " + m.get("subtitle", "")).lower()
+-                if ("btc" in t.lower() or "bitcoin" in title) and t not in seen_tickers:
+-                    seen_tickers.add(t)
+-                    btc_raw.append(m)
+-                    parsed = _parse_btc_market(m, now, client)
+-                    if parsed:
+-                        found_markets.append(parsed)
+-            # Debug: log first 5 BTC-tagged markets we found but couldn't parse
+-            if btc_raw and not found_markets:
+-                for m in btc_raw[:5]:
+-                    log.info(
+-                        "BTC market rejected: ticker=%s title=%r close=%s",
+-                        m.get("ticker"), m.get("title", "")[:80],
+-                        m.get("close_time", ""),
+-                    )
+-        except Exception as e:
+-            log.warning("Full scan fallback failed: %s", e)
++    # Intentionally no hourly/daily fallback: this bot is only for BTC 15m
++    # up/down markets.
+ 
+     # Sort by time remaining (nearest first)
+     found_markets.sort(key=lambda m: m.seconds_remaining)
+@@ -230,6 +254,36 @@ def scan_btc_markets(client: KalshiClient) -> list[BTCMarket]:
+     return found_markets
+ 
+ 
++def _fetch_markets_by_series(
++    client: KalshiClient,
++    series_ticker: str,
++    status: str = "",
++    limit: int = 1000,
++    min_close_ts: int | None = None,
++    max_close_ts: int | None = None,
++) -> dict:
++    """Fetch markets for one series, paginating defensively."""
++    markets: list[dict] = []
++    cursor = ""
++    pages = 0
++    while True:
++        resp = client.get_markets(
++            status=status,
++            limit=limit,
++            cursor=cursor,
++            series_ticker=series_ticker,
++            min_close_ts=str(min_close_ts or ""),
++            max_close_ts=str(max_close_ts or ""),
++            mve_filter="" if (min_close_ts or max_close_ts) else "exclude",
++        )
++        markets.extend(resp.get("markets", []))
++        cursor = resp.get("cursor", "")
++        pages += 1
++        if not cursor or pages >= 10:
++            break
++    return {"markets": markets, "cursor": cursor}
++
++
+ def _parse_btc_market(
+     market: dict,
+     now: datetime,
+@@ -237,6 +291,10 @@ def _parse_btc_market(
+ ) -> Optional[BTCMarket]:
+     """Parse a raw Kalshi market dict into a BTCMarket, or None if not valid."""
+ 
++    status = str(market.get("status", "")).lower()
++    if status and status not in {"open", "active"}:
++        return None
++
+     if not _is_btc_short_term(market):
+         log.debug(
+             "Filter rejected: ticker=%s title=%r",
+@@ -249,14 +307,14 @@ def _parse_btc_market(
+     subtitle = market.get("subtitle", "")
+     full_title = f"{title} {subtitle}".strip()
+ 
+-    # Parse target price — try floor_strike field first (KXBTC15M), then title
+-    target_price = market.get("floor_strike")
+-    if target_price is not None:
+-        target_price = float(target_price)
+-    else:
+-        target_price = _parse_target_price(full_title)
++    # Parse target price — live KXBTC15M starts as "Target price: TBD" and
++    # only becomes priceable once Kalshi exposes the numeric target.
++    target_price = _extract_target_price(market)
+     if target_price is None or target_price <= 0:
+-        log.debug("Could not parse target price from: %s", full_title)
++        log.debug(
++            "Could not parse target price from: ticker=%s status=%s title=%r subtitle=%r",
++            ticker, market.get("status"), title, subtitle,
++        )
+         return None
+ 
+     # Parse close time
+diff --git a/config.py b/config.py
+index 5fab0f0..bde94e5 100644
+--- a/config.py
++++ b/config.py
+@@ -43,12 +43,14 @@ SCAN_INTERVAL_SEC = 60
+ 
+ # ─── BTC 15-min bot ─────────────────────────────────────────────────────────
+ BTC_SCAN_INTERVAL_SEC = 30      # check every 30s (market is 15 min)
+-BTC_MIN_EDGE = 0.06             # lower bar than weather — high volume makes up for it
+-BTC_MIN_CONFIDENCE = 0.50       # vol estimate confidence
+-BTC_MAX_SPREAD = 0.08           # 8 cent max spread
++BTC_MIN_EDGE = 0.12             # require 12c model edge before any BTC trade
++BTC_MIN_CONFIDENCE = 0.70       # only trade once vol estimate has enough samples
++BTC_MAX_SPREAD = 0.06           # 6 cent max Kalshi spread
+ BTC_MAX_RISK_PER_TRADE = 3.00   # $3 max per trade (small bets, many trades)
+ BTC_MAX_DAILY_TRADES = 50       # cap at 50 trades/day
+ BTC_MAX_DAILY_LOSS = 25.00      # stop after $25 loss
+ BTC_VOL_WINDOW_MINUTES = 60     # rolling 1hr of 1-min candles for vol estimate
+ BTC_MIN_TIME_REMAINING_SEC = 120  # don't trade with < 2 min left
+-BTC_SERIES_TICKER = "KXBTC"     # will discover exact ticker from API
++BTC_SERIES_TICKER = "KXBTC15M"  # BTC price up/down rolling 15-minute series
++BTC_PAPER_WARMUP_HOURS = 48     # hard gate before live order execution
++BTC_MAX_TARGET_DISTANCE = 0.005 # skip BTC 15m if spot is >50 bps from target
+diff --git a/infra.py b/infra.py
+index a4735f5..567ff8e 100644
+--- a/infra.py
++++ b/infra.py
+@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
+ from datetime import datetime, timedelta, timezone
+ from enum import Enum
+ from typing import Any, Optional
++from urllib.parse import urlencode
+ import math
+ 
+ import httpx
+@@ -52,10 +53,12 @@ class KalshiClient:
+     def __init__(self, env: Env = Env.DEMO):
+         self.env = env
+         self.base_url = DEMO_REST_BASE if env == Env.DEMO else LIVE_REST_BASE
+-        self._api_key = os.environ["KALSHI_API_KEY"]
+-        key_path = os.environ["KALSHI_PRIVATE_KEY_PATH"]
+-        with open(key_path, "rb") as f:
+-            self._private_key = serialization.load_pem_private_key(f.read(), password=None)
++        self._api_key = os.environ.get("KALSHI_API_KEY", "")
++        key_path = os.environ.get("KALSHI_PRIVATE_KEY_PATH", "")
++        self._private_key = None
++        if self._api_key and key_path:
++            with open(key_path, "rb") as f:
++                self._private_key = serialization.load_pem_private_key(f.read(), password=None)
+         self._http = httpx.Client(timeout=10.0)
+         self._rate_limiter = _RateLimiter(requests_per_second=10)
+         self._circuit_open = False
+@@ -79,6 +82,8 @@ class KalshiClient:
+         return ts_ms, base64.b64encode(sig).decode("utf-8")
+ 
+     def _headers(self, method: str, path: str) -> dict[str, str]:
++        if not self._api_key or self._private_key is None:
++            raise RuntimeError("Kalshi credentials are required for authenticated requests")
+         ts, sig = self._sign(method, path)
+         return {
+             "KALSHI-ACCESS-KEY": self._api_key,
+@@ -102,7 +107,11 @@ class KalshiClient:
+         url = self.base_url + endpoint
+         # Path for signing: /trade-api/v2 + endpoint without query string
+         sign_path = "/trade-api/v2" + endpoint.split("?")[0]
+-        headers = self._headers(method, sign_path)
++        headers = {"Content-Type": "application/json"}
++        if self._api_key and self._private_key is not None:
++            headers = self._headers(method, sign_path)
++        elif endpoint.startswith("/portfolio"):
++            raise RuntimeError("Kalshi credentials are required for portfolio requests")
+         resp = self._http.request(method, url, headers=headers, **kwargs)
+         if resp.status_code == 429 or resp.status_code >= 500:
+             self._circuit_failures += 1
+@@ -139,19 +148,26 @@ class KalshiClient:
+ 
+     def get_markets(self, status: str = "open", limit: int = 200, cursor: str = "",
+                     mve_filter: str = "", max_close_ts: str = "",
+-                    min_close_ts: str = "", tickers: str = "") -> dict:
+-        params = f"?status={status}&limit={limit}"
++                    min_close_ts: str = "", tickers: str = "",
++                    series_ticker: str = "", event_ticker: str = "") -> dict:
++        params: dict[str, str | int] = {"limit": limit}
++        if status:
++            params["status"] = status
+         if cursor:
+-            params += f"&cursor={cursor}"
++            params["cursor"] = cursor
+         if mve_filter:
+-            params += f"&mve_filter={mve_filter}"
++            params["mve_filter"] = mve_filter
+         if max_close_ts:
+-            params += f"&max_close_ts={max_close_ts}"
++            params["max_close_ts"] = max_close_ts
+         if min_close_ts:
+-            params += f"&min_close_ts={min_close_ts}"
++            params["min_close_ts"] = min_close_ts
+         if tickers:
+-            params += f"&tickers={tickers}"
+-        return self._request("GET", f"/markets{params}")
++            params["tickers"] = tickers
++        if series_ticker:
++            params["series_ticker"] = series_ticker
++        if event_ticker:
++            params["event_ticker"] = event_ticker
++        return self._request("GET", f"/markets?{urlencode(params)}")
+ 
+     def get_market(self, ticker: str) -> dict:
+         return self._request("GET", f"/markets/{ticker}")
+@@ -612,7 +628,7 @@ class RiskEngine:
+     """
+ 
+     PORTFOLIO_CAP = 0.25
+-    KILL_DRAWDOWN_PCT = 0.25       # 25% rolling 7-day drawdown — HARD CODED
++    KILL_DRAWDOWN_PCT = 0.15       # 15% rolling 7-day drawdown — HARD CODED
+     DAILY_STOP_LOSS_PCT = 0.15     # 15% daily loss limit — HARD CODED
+     MAX_BET_PCT = 0.05             # 5% max per trade — HARD CODED, not tunable
+ 
+diff --git a/tests/test_btc.py b/tests/test_btc.py
+index 8670883..94c742e 100644
+--- a/tests/test_btc.py
++++ b/tests/test_btc.py
+@@ -1,11 +1,29 @@
+ """Tests for BTC 15-min trading bot components."""
+ import math
++import sqlite3
+ import pytest
+ from btc_model import (
+     price_btc_contract, compute_realized_vol, BTCEstimate,
+     _compute_momentum_drift, VOL_FLOOR_ANNUAL,
+ )
+-from btc_scanner import _parse_target_price, _is_btc_short_term
++from datetime import datetime, timedelta, timezone
++
++from btc_scanner import (
++    _extract_target_price,
++    _is_btc_short_term,
++    _parse_btc_market,
++    _parse_target_price,
++)
++from btc_bot import (
++    BTCExecutionConfig,
++    LIVE_ACK_ENV,
++    _ensure_btc_tables,
++    _get_or_start_btc_warmup,
++    _live_gate,
++)
++from config import BTC_PAPER_WARMUP_HOURS
++from infra import Env
++from infra import KalshiClient
+ 
+ 
+ # ─── Model tests ─────────────────────────────────────────────────────────────
+@@ -265,6 +283,152 @@ class TestTargetParsing:
+     def test_no_price_returns_none(self):
+         assert _parse_target_price("BTC market") is None
+ 
++    def test_target_price_tbd_returns_none(self):
++        assert _parse_target_price("Target price: TBD") is None
++
++    def test_extracts_target_from_live_subtitle(self):
++        m = {
++            "ticker": "KXBTC15M-26APR131230-30",
++            "title": "BTC price up in next 15 mins?",
++            "subtitle": "Target price: $83,421.25",
++        }
++        assert _extract_target_price(m) == 83421.25
++
++    def test_extracts_target_from_custom_strike(self):
++        m = {
++            "custom_strike": {"target": {"value": "$83,421.25"}},
++            "title": "BTC price up in next 15 mins?",
++        }
++        assert _extract_target_price(m) == 83421.25
++
++
++class TestBTCMarketParsing:
++    class DummyClient:
++        def get_orderbook(self, ticker, depth=10):
++            return {
++                "orderbook_fp": {
++                    "yes_dollars": [["0.4500", "10.00"]],
++                    "no_dollars": [["0.5200", "12.00"]],
++                }
++            }
++
++    def test_initialized_target_tbd_is_not_priceable(self):
++        now = datetime.now(timezone.utc)
++        m = {
++            "ticker": "KXBTC15M-26APR131230-30",
++            "event_ticker": "KXBTC15M-26APR131230",
++            "title": "BTC price up in next 15 mins?",
++            "subtitle": "Target price: TBD",
++            "status": "initialized",
++            "close_time": (now + timedelta(minutes=15)).isoformat(),
++        }
++        assert _parse_btc_market(m, now, self.DummyClient()) is None
++
++    def test_initialized_target_price_is_not_tradeable(self):
++        now = datetime.now(timezone.utc)
++        m = {
++            "ticker": "KXBTC15M-26APR131230-30",
++            "event_ticker": "KXBTC15M-26APR131230",
++            "title": "BTC price up in next 15 mins?",
++            "subtitle": "Target price: $83,421.25",
++            "status": "initialized",
++            "close_time": (now + timedelta(minutes=10)).isoformat(),
++        }
++        assert _parse_btc_market(m, now, self.DummyClient()) is None
++
++    def test_open_15m_market_with_target_is_priceable(self):
++        now = datetime.now(timezone.utc)
++        m = {
++            "ticker": "KXBTC15M-26APR131230-30",
++            "event_ticker": "KXBTC15M-26APR131230",
++            "title": "BTC price up in next 15 mins?",
++            "subtitle": "Target price: $83,421.25",
++            "status": "open",
++            "close_time": (now + timedelta(minutes=10)).isoformat(),
++        }
++        parsed = _parse_btc_market(m, now, self.DummyClient())
++        assert parsed is not None
++        assert parsed.target_price == 83421.25
++        assert parsed.yes_bid == 0.45
++        assert parsed.yes_ask == 0.48
++
++
++class TestBTCWarmupGate:
++    def test_warmup_starts_incomplete(self):
++        db = sqlite3.connect(":memory:")
++        db.row_factory = sqlite3.Row
++        _ensure_btc_tables(db)
++        now = datetime(2026, 4, 13, 12, 0, tzinfo=timezone.utc)
++
++        status = _get_or_start_btc_warmup(db, now=now)
++
++        assert status.started_at == now
++        assert not status.complete
++        assert status.hours_required == BTC_PAPER_WARMUP_HOURS
++
++    def test_live_gate_blocks_until_48h_even_with_ack(self, monkeypatch):
++        db = sqlite3.connect(":memory:")
++        db.row_factory = sqlite3.Row
++        _ensure_btc_tables(db)
++        monkeypatch.setenv(LIVE_ACK_ENV, "true")
++        monkeypatch.setattr("btc_bot.PAUSED_FILE", "/tmp/nonexistent-btc-paused-file")
++        now = datetime(2026, 4, 13, 12, 0, tzinfo=timezone.utc)
++
++        gate = _live_gate(
++            db,
++            BTCExecutionConfig(env=Env.LIVE, live_orders_requested=True),
++            now=now,
++        )
++
++        assert not gate.allowed
++        assert "warmup incomplete" in gate.reason
++
++    def test_live_gate_allows_after_48h_with_ack(self, monkeypatch):
++        db = sqlite3.connect(":memory:")
++        db.row_factory = sqlite3.Row
++        _ensure_btc_tables(db)
++        monkeypatch.setenv(LIVE_ACK_ENV, "true")
++        monkeypatch.setattr("btc_bot.PAUSED_FILE", "/tmp/nonexistent-btc-paused-file")
++        now = datetime(2026, 4, 13, 12, 0, tzinfo=timezone.utc)
++        started = now - timedelta(hours=BTC_PAPER_WARMUP_HOURS, minutes=1)
++        db.execute(
++            "INSERT INTO btc_runtime_state (key, value, updated_at) VALUES (?, ?, ?)",
++            ("paper_warmup_started_at", started.isoformat(), started.isoformat()),
++        )
++        db.commit()
++
++        gate = _live_gate(
++            db,
++            BTCExecutionConfig(env=Env.LIVE, live_orders_requested=True),
++            now=now,
++        )
++
++        assert gate.allowed
++
++
++class TestKalshiPublicClient:
++    def test_public_client_can_initialize_without_credentials(self, monkeypatch):
++        monkeypatch.delenv("KALSHI_API_KEY", raising=False)
++        monkeypatch.delenv("KALSHI_PRIVATE_KEY_PATH", raising=False)
++
++        client = KalshiClient(env=Env.LIVE)
++
++        assert client._api_key == ""
++        assert client._private_key is None
++
++    def test_portfolio_request_requires_credentials(self, monkeypatch):
++        monkeypatch.delenv("KALSHI_API_KEY", raising=False)
++        monkeypatch.delenv("KALSHI_PRIVATE_KEY_PATH", raising=False)
++        client = KalshiClient(env=Env.LIVE)
++
++        with pytest.raises(RuntimeError, match="credentials"):
++            client.create_order(
++                ticker="KXBTC15M-TEST",
++                side="yes",
++                contracts=1,
++                price_cents=50,
++            )
++
+ 
+ class TestMarketClassification:
+     def test_updown_market(self):
+diff --git a/kalshi-btc.service b/kalshi-btc.service
+new file mode 100644
+index 0000000..75c10e3
+--- /dev/null
++++ b/kalshi-btc.service
+@@ -0,0 +1,16 @@
++[Unit]
++Description=Kalshi BTC 15-Minute Paper Bot
++After=network.target
++
++[Service]
++User=ubuntu
++WorkingDirectory=/home/ubuntu/autoresearch
++EnvironmentFile=/home/ubuntu/autoresearch/.env
++ExecStart=/home/ubuntu/autoresearch/.venv/bin/python btc_bot.py --live --yes
++Restart=on-failure
++RestartSec=30
++StandardOutput=journal
++StandardError=journal
++
++[Install]
++WantedBy=multi-user.target

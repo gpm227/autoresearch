@@ -1,0 +1,16 @@
+[Unit]
+Description=Kalshi Autoresearch Loop
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/autoresearch
+EnvironmentFile=/home/ubuntu/autoresearch/.env
+ExecStart=/home/ubuntu/autoresearch/.venv/bin/python autoresearch.py
+Restart=on-failure
+RestartSec=60
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

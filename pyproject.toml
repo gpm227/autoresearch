@@ -1,27 +1,22 @@
 [project]
-name = "autoresearch"
+name = "kalshi-bot"
 version = "0.1.0"
-description = "Autonomous pretraining research swarm"
-readme = "README.md"
+description = "Autonomous Kalshi trading bot"
 requires-python = ">=3.10"
 dependencies = [
-    "kernels>=0.11.7",
-    "matplotlib>=3.10.8",
-    "numpy>=2.2.6",
-    "pandas>=2.3.3",
-    "pyarrow>=21.0.0",
-    "requests>=2.32.0",
-    "rustbpe>=0.1.0",
-    "tiktoken>=0.11.0",
-    "torch==2.9.1",
+    "cryptography>=44.0.0",
+    "feedparser>=6.0.11",
+    "httpx>=0.28.0",
+    "kalshi-python-sync>=3.2.0",
+    "websockets>=14.0",
+    "discord.py>=2.3.0",
+    "beautifulsoup4>=4.12.0",
+    "requests>=2.33.1",
+    "scipy>=1.15.3",
+    "websocket-client>=1.7.0",
 ]
 
-[tool.uv.sources]
-torch = [
-    { index = "pytorch-cu128" },
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
 ]
-
-[[tool.uv.index]]
-name = "pytorch-cu128"
-url = "https://download.pytorch.org/whl/cu128"
-explicit = true
