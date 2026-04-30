@@ -1034,6 +1034,10 @@ class Discord:
         except Exception as e:
             log.warning("Discord send failed: %s", e)
 
+    def post(self, message: str) -> None:
+        """Post a plain-text status message through the webhook."""
+        self._send(message)
+
     def bot_started(self, balance_dollars: float, cancelled_orders: int,
                     mode: str = "demo") -> None:
         self._send(

@@ -9,15 +9,21 @@ from btc_model import (
 from datetime import datetime, timedelta, timezone
 
 from btc_scanner import (
+    BTCMarket,
     _extract_target_price,
     _is_btc_short_term,
     _parse_btc_market,
     _parse_target_price,
 )
 from btc_bot import (
+    BTCPortfolioSnapshot,
     BTCExecutionConfig,
     LIVE_ACK_ENV,
+    _format_btc_portfolio_message,
+    _format_btc_settlement_message,
+    _format_btc_trade_open_message,
     _ensure_btc_tables,
+    _get_btc_portfolio_snapshot,
     _get_or_start_btc_warmup,
     _live_gate,
 )
@@ -570,3 +576,110 @@ class TestBTCSimulator:
         assert metrics.losses == 0
         assert metrics.win_rate == 1.0
         assert metrics.net_pnl == pytest.approx(6.42, rel=1e-6)
+
+
+class TestBTCPortfolioFormatting:
+    def test_portfolio_snapshot_aggregates_open_and_settled_rows(self):
+        db = sqlite3.connect(":memory:")
+        db.row_factory = sqlite3.Row
+        _ensure_btc_tables(db)
+        today = "2026-04-28"
+        db.execute(
+            "INSERT INTO btc_daily_state (date, trades_count, realized_pnl, day_locked, updated_at) VALUES (?, ?, ?, 0, ?)",
+            (today, 3, 4.25, "2026-04-28T12:00:00+00:00"),
+        )
+        db.execute(
+            """
+            INSERT INTO btc_paper_positions
+            (contract_id, ticker, side, quantity, entry_price, max_loss, opened_at, status)
+            VALUES
+            ('A', 'A', 'yes', 5, 0.40, 2.0, '2026-04-28T12:00:00+00:00', 'open'),
+            ('B', 'B', 'no', 4, 0.30, 1.2, '2026-04-28T12:05:00+00:00', 'open')
+            """
+        )
+        db.execute(
+            """
+            INSERT INTO btc_paper_positions
+            (contract_id, ticker, side, quantity, entry_price, max_loss, opened_at, closed_at, realized_pnl, status)
+            VALUES
+            ('C', 'C', 'yes', 4, 0.45, 1.8, '2026-04-28T11:00:00+00:00', '2026-04-28T11:15:00+00:00', 2.20, 'settled'),
+            ('D', 'D', 'no', 6, 0.25, 1.5, '2026-04-28T11:30:00+00:00', '2026-04-28T11:45:00+00:00', -1.00, 'settled')
+            """
+        )
+        db.commit()
+
+        snapshot = _get_btc_portfolio_snapshot(db, today=today)
+
+        assert snapshot.open_positions == 2
+        assert snapshot.open_risk == pytest.approx(3.2)
+        assert snapshot.today_trades == 3
+        assert snapshot.today_realized_pnl == pytest.approx(4.25)
+        assert snapshot.settled_total == 2
+        assert snapshot.wins == 1
+        assert snapshot.losses == 1
+        assert snapshot.realized_pnl_total == pytest.approx(1.20)
+
+    def test_portfolio_message_includes_rolling_record(self):
+        snapshot = BTCPortfolioSnapshot(
+            open_positions=1,
+            open_risk=2.9,
+            today_trades=4,
+            today_realized_pnl=-1.75,
+            settled_total=5,
+            wins=3,
+            losses=2,
+            realized_pnl_total=6.40,
+        )
+
+        msg = _format_btc_portfolio_message(snapshot)
+
+        assert msg == (
+            "PORTFOLIO | open=1 risk=$2.90 | today=4 pnl=$-1.75 | "
+            "lifetime=3-2 (60%) pnl=$+6.40"
+        )
+
+    def test_trade_open_message_contains_market_and_edge(self):
+        market = BTCMarket(
+            ticker="KXBTC15M-TEST",
+            event_ticker="KXBTC15M-TEST",
+            title="BTC price up in next 15 mins?",
+            target_price=76142.06,
+            close_time=datetime(2026, 4, 28, 19, 45, tzinfo=timezone.utc),
+            seconds_remaining=449,
+            yes_bid=0.56,
+            yes_ask=0.58,
+            no_bid=0.41,
+            no_ask=0.43,
+            spread=0.02,
+            bid_depth=10,
+            ask_depth=8,
+            volume=100,
+        )
+        estimate = BTCEstimate(
+            contract_id="KXBTC15M-TEST",
+            prob_yes=0.585,
+            confidence=0.82,
+            current_price=76169.45,
+            target_price=76142.06,
+            seconds_remaining=449,
+            realized_vol=0.35,
+        )
+
+        msg = _format_btc_trade_open_message(market, estimate, "no", 0.125, 6)
+
+        assert msg == (
+            "PAPER BET | KXBTC15M-TEST | NO 6 @ 43.0c | edge=12.5c model=0.585 conf=0.82 | "
+            "btc=$76,169.45 target=$76,142.06 t=449s"
+        )
+
+    def test_settlement_message_formats_win_loss(self):
+        msg = _format_btc_settlement_message(
+            ticker="KXBTC15M-TEST",
+            side="no",
+            quantity=6,
+            entry_price=0.43,
+            result="no",
+            pnl=3.42,
+        )
+
+        assert msg == "SETTLED [W] | KXBTC15M-TEST | NO 6 @ 43.0c -> NO | pnl=$+3.42"

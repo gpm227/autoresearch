@@ -27,7 +27,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from infra import Env, KalshiClient
+from infra import Discord, Env, KalshiClient
 from btc_feed import BTCFeed, FeedHealth
 from btc_scanner import scan_btc_markets, BTCMarket, is_btc15_market
 import btc_model
@@ -87,6 +87,24 @@ class BTCLiveGate:
     allowed: bool
     reason: str
     warmup: BTCWarmupStatus
+
+
+@dataclass(frozen=True)
+class BTCPortfolioSnapshot:
+    open_positions: int
+    open_risk: float
+    today_trades: int
+    today_realized_pnl: float
+    settled_total: int
+    wins: int
+    losses: int
+    realized_pnl_total: float
+
+    @property
+    def win_rate(self) -> float:
+        if self.settled_total == 0:
+            return 0.0
+        return self.wins / self.settled_total
 
 
 # ─── BTC risk state ─────────────────────────────────────────────────────────
@@ -347,6 +365,88 @@ def _btc_trade_quantity(
     return strategy.contracts_for_entry_price(entry_price)
 
 
+def _get_btc_portfolio_snapshot(
+    db: sqlite3.Connection,
+    today: Optional[str] = None,
+) -> BTCPortfolioSnapshot:
+    today_str = today or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    daily = _get_btc_daily_state(db, today_str)
+    open_row = db.execute(
+        """
+        SELECT
+            COUNT(*) AS open_positions,
+            COALESCE(SUM(max_loss), 0) AS open_risk
+        FROM btc_paper_positions
+        WHERE status='open'
+        """
+    ).fetchone()
+    settled = db.execute(
+        """
+        SELECT
+            COUNT(*) AS settled_total,
+            SUM(CASE WHEN realized_pnl > 0 THEN 1 ELSE 0 END) AS wins,
+            SUM(CASE WHEN realized_pnl <= 0 THEN 1 ELSE 0 END) AS losses,
+            COALESCE(SUM(realized_pnl), 0) AS realized_pnl_total
+        FROM btc_paper_positions
+        WHERE status='settled'
+        """
+    ).fetchone()
+    return BTCPortfolioSnapshot(
+        open_positions=int(open_row["open_positions"] or 0),
+        open_risk=float(open_row["open_risk"] or 0.0),
+        today_trades=int(daily["trades_count"] or 0),
+        today_realized_pnl=float(daily["realized_pnl"] or 0.0),
+        settled_total=int(settled["settled_total"] or 0),
+        wins=int(settled["wins"] or 0),
+        losses=int(settled["losses"] or 0),
+        realized_pnl_total=float(settled["realized_pnl_total"] or 0.0),
+    )
+
+
+def _format_btc_portfolio_message(
+    snapshot: BTCPortfolioSnapshot,
+    prefix: str = "PORTFOLIO",
+) -> str:
+    return (
+        f"{prefix} | open={snapshot.open_positions} risk=${snapshot.open_risk:.2f} | "
+        f"today={snapshot.today_trades} pnl=${snapshot.today_realized_pnl:+.2f} | "
+        f"lifetime={snapshot.wins}-{snapshot.losses} "
+        f"({snapshot.win_rate:.0%}) pnl=${snapshot.realized_pnl_total:+.2f}"
+    )
+
+
+def _format_btc_trade_open_message(
+    market: BTCMarket,
+    estimate: BTCEstimate,
+    side: str,
+    edge: float,
+    contracts: int,
+) -> str:
+    entry_price = market.yes_ask if side == "yes" else market.no_ask
+    entry_cents = (entry_price or 0.0) * 100.0
+    return (
+        f"PAPER BET | {market.ticker} | {side.upper()} {contracts} @ {entry_cents:.1f}c | "
+        f"edge={edge * 100:.1f}c model={estimate.prob_yes:.3f} conf={estimate.confidence:.2f} | "
+        f"btc=${estimate.current_price:,.2f} target=${estimate.target_price:,.2f} "
+        f"t={int(estimate.seconds_remaining)}s"
+    )
+
+
+def _format_btc_settlement_message(
+    ticker: str,
+    side: str,
+    quantity: int,
+    entry_price: float,
+    result: str,
+    pnl: float,
+) -> str:
+    icon = "W" if pnl > 0 else "L"
+    return (
+        f"SETTLED [{icon}] | {ticker} | {side.upper()} {quantity} @ {entry_price * 100:.1f}c "
+        f"-> {result.upper()} | pnl=${pnl:+.2f}"
+    )
+
+
 def _record_btc_evaluation(
     db: sqlite3.Connection,
     market: BTCMarket,
@@ -528,7 +628,11 @@ def _generate_btc_signal(
 
 # ─── Settlement ──────────────────────────────────────────────────────────────
 
-def _settle_open_positions(db: sqlite3.Connection, client: KalshiClient) -> int:
+def _settle_open_positions(
+    db: sqlite3.Connection,
+    client: KalshiClient,
+    discord: Optional[Discord] = None,
+) -> int:
     """
     Check all open BTC paper positions. If the market has settled on Kalshi,
     compute P&L and close the position.
@@ -596,6 +700,19 @@ def _settle_open_positions(db: sqlite3.Connection, client: KalshiClient) -> int:
             ticker, side.upper(), outcome, result, "+" if pnl > 0 else "",
             pnl, entry_price, quantity,
         )
+        if discord is not None:
+            snapshot = _get_btc_portfolio_snapshot(db, today=today)
+            discord.post(
+                _format_btc_settlement_message(
+                    ticker=ticker,
+                    side=side,
+                    quantity=int(quantity),
+                    entry_price=float(entry_price),
+                    result=result,
+                    pnl=float(pnl),
+                )
+            )
+            discord.post(_format_btc_portfolio_message(snapshot))
 
     if settled:
         db.commit()
@@ -608,6 +725,7 @@ def _tick(
     client: KalshiClient,
     feed: BTCFeed,
     execution: BTCExecutionConfig,
+    discord: Optional[Discord] = None,
     strategy: BTCStrategy = DEFAULT_BTC_STRATEGY,
 ) -> None:
     """One scan cycle for BTC 15-min markets."""
@@ -618,7 +736,7 @@ def _tick(
     daily_state = _get_btc_daily_state(db, today)
 
     # Settle any expired positions
-    settled = _settle_open_positions(db, client)
+    settled = _settle_open_positions(db, client, discord=discord)
     if settled:
         daily_state = _get_btc_daily_state(db, today)
 
@@ -762,6 +880,8 @@ def _tick(
         if pos_id > 0:
             paper_opened = True
             trades_opened += 1
+            entry_price = market.yes_ask if side == "yes" else market.no_ask
+            contracts = _btc_trade_quantity(entry_price or 0.0, strategy=strategy)
             log.info(
                 "BTC PAPER TRADE: %s %s | btc=$%.2f target=$%.2f | "
                 "model=%.3f market=%.3f edge=%.3f | vol=%.1f%% t=%ds",
@@ -774,6 +894,18 @@ def _tick(
             )
             # Refresh daily state after trade
             daily_state = _get_btc_daily_state(db, today)
+            if discord is not None:
+                snapshot = _get_btc_portfolio_snapshot(db, today=today)
+                discord.post(
+                    _format_btc_trade_open_message(
+                        market=market,
+                        estimate=estimate,
+                        side=side,
+                        edge=edge,
+                        contracts=contracts,
+                    )
+                )
+                discord.post(_format_btc_portfolio_message(snapshot))
             live_attempted = _maybe_place_live_order(
                 db=db,
                 client=client,
@@ -839,6 +971,7 @@ def run_loop(
         live_orders_requested=live_orders_requested,
     )
     client = KalshiClient(env=env)
+    discord = Discord()
 
     # Start price feed
     feed = BTCFeed()
@@ -875,7 +1008,7 @@ def run_loop(
         ticks = 0
         while True:
             try:
-                _tick(client, feed, execution, strategy=strategy)
+                _tick(client, feed, execution, discord=discord, strategy=strategy)
                 ticks += 1
                 if max_ticks is not None and ticks >= max_ticks:
                     log.info("Max ticks reached (%d); exiting", max_ticks)
