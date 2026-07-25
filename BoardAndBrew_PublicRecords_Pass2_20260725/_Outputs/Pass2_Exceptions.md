@@ -14,14 +14,14 @@ The pass-1 Exceptions tab was not available in this environment, so the "eight o
 
 | # | Implied open item | Status this pass |
 |---|---|---|
-| 1 | Roster-only stores absent from ABC table (HB, Costa Mesa, Lake Forest, Thousand Oaks, Santa Ana, Cypress, Tempe, San Clemente) — resolve operator/existence | PENDING (store-reconciliation agent running) |
-| 2 | Torrance address discrepancy (21221 Hawthorne Ste 140 vs 21211 Hawthorne Unit A) | OPEN — not independently resolved; ABC table value retained |
-| 3 | Ladera Ranch address discrepancy (5606 vs 25606 Crown Valley Pkwy) | LIKELY TYPO — 25606 is the deliverable value; 5606 appears to be a dropped digit (to verify) |
-| 4 | Harbor: 3030 Harbor Blvd Costa Mesa vs 825 N Harbor Dr San Diego — same or two stores? | OPEN — treat as two distinct stores pending confirmation (different cities/counties) |
-| 5 | Formal entity behind "Board & Brew Coastal Carlsbad" (2 EDD liens) | PENDING (individuals/courts agent running) |
-| 6 | "Board and Brew, Inc." (~1987) predecessor — confirm/exclude | OPEN — not located this pass |
-| 7 | CA state trademark registration 66474 (1979) status | GAP — CA SOS trademark DB is JS-only, not fetchable |
-| 8 | Rosen v. JJ&N Enterprises — run to docket level | PENDING (courts agent running) |
+| 1 | Roster-only stores absent from ABC table (HB, Costa Mesa, Lake Forest, Thousand Oaks, Santa Ana, Cypress, Tempe, San Clemente) — resolve operator/existence | **RESOLVED (operating status)** — all 8 confirmed open; operators named for Thousand Oaks (Hubbard) & Cypress (Williams); HB operated by OC Sands LLC (SOS mirror). Health-permit records still GAP. |
+| 2 | Torrance address discrepancy (21221 Hawthorne Ste 140 vs 21211 Hawthorne Unit A) | STILL OPEN — not independently resolved; ABC value (21211 Unit A) retained |
+| 3 | Ladera Ranch address discrepancy (5606 vs 25606 Crown Valley Pkwy) | RESOLVED (provisional) — 25606 retained; 5606 = dropped-digit typo |
+| 4 | Harbor: 3030 Harbor Blvd Costa Mesa vs 825 N Harbor Dr San Diego — same or two stores? | **RESOLVED — two distinct stores.** 825 N Harbor Dr = SDB&B LLC (real 2025 CA entity, doc B20250024014); Costa Mesa 3030 Harbor is a separate OC store (open per Yelp) |
+| 5 | Formal entity behind "Board & Brew Coastal Carlsbad" (2 EDD liens) | **RESOLVED (entity)** — CCB&B LLC / Two Rippers LLC per BBB. The liens themselves still GAP |
+| 6 | "Board and Brew, Inc." (~1987) predecessor — confirm/exclude | STILL OPEN — not located this pass |
+| 7 | CA state trademark registration 66474 (1979) status | STILL GAP — CA SOS trademark DB is JS-only, not fetchable |
+| 8 | Rosen v. JJ&N Enterprises — run to docket level | **PARTIALLY RESOLVED** — confirmed to index level (filed 2011-08-09, dismissed w/ prejudice, plaintiff Kenneth Rosen); exact docket number still GAP (UniCourt body 405-blocked) |
 
 ## 2. Conflicts / discrepancies surfaced this pass
 
@@ -29,6 +29,11 @@ The pass-1 Exceptions tab was not available in this environment, so the "eight o
   - Consequence for **Miami-Dade 2024-010471-CA-01 (BBRG, LLC et al v. Christopher Viso):** the plaintiff cluster aligns with the Florida BBRG (Bravo Brio) entities, not the California Board & Brew entity. **Provisional resolution: EXCLUDE the Del Mar entity** (SEARCH-INFERRED; Trellis/Sunbiz detail pages were blocked, so not confirmed to docket level).
   - Consequence for **OSHA:** an inspection record "Bbrg Tr, Llc" (id 1134580.015) is the Florida Bravo Brio entity, NOT a subject here.
 - **X-2. BOARD & BREW SAUCE registration number.** Task lists Reg. **7192954** for BOARD & BREW SAUCE; the owner portfolio shows that mark as **serial 97561220**, registered 2023-10-17. These are consistent (a serial and its resulting registration), not a conflict — recorded for traceability.
+- **X-3. Pacific Beach: liquor DENIED vs. storefront operating.** ABC shows 4516 Mission Blvd (PBB&B, LLC) as DENIED, yet the storefront traded and took a temporary SD County health closure 2024-12-10. Two public records disagree on whether the store was operating.
+- **X-4. Cypress address.** Roster/ABC = 5253 Katella Ave; the opening news article = 5247 Katella. Same shopping center; digit-level discrepancy unresolved.
+- **X-5. Two Rippers LLC address.** SOS-mirror principal/mailing address is 23801 Calabasas Rd #2026, Calabasas (LA County) though the store it licenses is in Carlsbad — a mailing-agent address, not the store; flagged so it is not mistaken for a location.
+- **X-6. Clayton Wheeler record gap.** Press consistently names Wheeler as first B&B franchisee / Blacktop co-founder, but no fetchable SOS filing lists him as manager/member of a specific B&B LLC; the bizprofile "Clayton Wheeler" authorized-person page shows unrelated namesakes. Association is press-level only.
+- **X-7. Mike Murphy & SCBNB LLC.** No public record located tying Mike Murphy to any B&B entity; SCBNB LLC (the presumed San Clemente entity) returned no fetchable filing. Both remain unresolved (GAP), not excluded.
 
 ## 3. Ambiguities resolved by reasonable default (unattended-run choices)
 

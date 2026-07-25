@@ -1,36 +1,51 @@
 # Board & Brew — Public Records Pass 2 — Delta Memo
-Run date: 2026-07-25 · Factual only. Read-only public-records retrieval (WebSearch + WebFetch; no browser automation, no authenticated portals).
+Run date: 2026-07-25 · Factual only; no recommendations. Read-only public-records retrieval (WebSearch + WebFetch; no browser automation, no screenshots, no authenticated/JS portals, no PACER).
 
-> Scope note: The pass-1 workbook/memo/ER diagram were not present in this environment, so "changes vs. the prior record" below are stated against the task brief's own tabulated pass-1 data (the ABC store table, entity list, trademark list) rather than against the prior workbook file. Where a portal was not machine-readable this session it is marked GAP; see Pass2_SourceLog.csv for every attempt and Pass2_Exceptions.md for tooling limits.
+> Scope note: The pass-1 workbook/memo/ER diagram were not present in this run environment, so "changes vs. the prior record" are stated against the task brief's tabulated pass-1 data (ABC store table, entity list, trademark list), not against the prior workbook file. Every portal not machine-readable this session is marked GAP. See Pass2_SourceLog.csv (49 rows) for every attempt and Pass2_Exceptions.md for tooling limits and conflicts.
 
 ## A. CHANGES to records already pulled (lead)
 
-1. **Trademark portfolio has grown since the pass-1 list.** Two new **pending** applications are now on file for JJ&N Enterprises, Inc.: serial **99915236** (logo mark, filed 2026-06-30) and serial **99917824** (BOARD & BREW stylized, filed 2026-07-01) — both **Live/Pending**. The three prior marks are unchanged and live: BOARD & BREW (serial 86335235 / Reg 5443521, renews 2028-04-10) and BOARD & BREW SAUCE (serial 97561220 / task-cited Reg 7192954, registered 2023-10-17, expires 2029-10-17); TURKADO (serial 97561278) is now **Dead/Abandoned as of 2024-07-30**. Source: trademarkia.com owner portfolio for JJ&N Enterprises Inc (SEARCH-INFERRED; USPTO direct = JS, blocked).
-2. **Pacific Beach store status changed.** The ABC table lists 4516 Mission Blvd (PBB&B, LLC) as **DENIED**. Independently, the storefront was operating and was **temporarily ordered closed by San Diego County health on 2024-12-10** (vermin/temperature), i.e. it opened under some authority despite the ABC "DENIED" line — a discrepancy to reconcile. Source: sandiegoville.com (SEARCH-INFERRED).
-3. **New location not on the pass-1 tables:** Anaheim, 5701 E Santa Ana Canyon Rd, appears in current third-party listings (SEARCH-INFERRED).
+1. **Trademark portfolio grew.** Two NEW pending JJ&N applications since the pass-1 list: serial **99915236** (logo, filed 2026-06-30) and **99917824** (BOARD & BREW stylized, filed 2026-07-01), both Live/Pending. Unchanged/live: BOARD & BREW (86335235 / Reg 5443521, renews 2028-04-10) and BOARD & BREW SAUCE (97561220 / brief-cited Reg 7192954, reg 2023-10-17, exp 2029-10-17). **TURKADO (97561278) went Dead/Abandoned 2024-07-30.** All five serials/registrations in the brief were cross-confirmed. Source: trademarkia owner portfolio (SEARCH-INFERRED; USPTO direct blocked).
+2. **Pacific Beach discrepancy.** ABC lists 4516 Mission Blvd (PBB&B, LLC) as **DENIED**, but the storefront operated and drew a **temporary SD County health closure on 2024-12-10** (vermin/temperature). The store existed and traded despite the "DENIED" liquor line — reconcile. (SEARCH-INFERRED.)
+3. **New location not on pass-1 tables:** Anaheim, 5701 E Santa Ana Canyon Rd (current third-party listings).
+4. **Ladera Ranch** roster "5606" vs ABC "25606" Crown Valley Pkwy: 25606 retained (5606 = dropped-digit typo, unverified). **Torrance** 21221 Ste 140 vs 21211 Unit A: unresolved; ABC value retained. **Harbor**: 3030 Harbor Blvd, Costa Mesa (OC) and 825 N Harbor Dr, San Diego are treated as **two distinct stores** (different counties; 825 N Harbor = SDB&B LLC, confirmed as a real 2025 entity).
 
 ## B. NEW material since 2026-07-25
 
-### Trademarks / IP (Track 4)
-- Full five-mark portfolio for JJ&N confirmed and cross-checked against every serial/registration in the brief (all five match). GAPs: USPTO Assignment Center (assignments/security interests), TSDR file wrapper (specimens/first-use), and CA state reg 66474 (1979) — all JS/blocked this session.
+### Franchisee entities & people (Track 4) — biggest new category
+- **BBRG, LLC (franchisor) managers: Tom Powers, Mike DeSanti, Bret Crutchfield** (bizprofile/SOS mirror).
+- Franchisee LLCs with managers located (all SEARCH-INFERRED via bizprofile SOS mirror): **TWO RIPPERS** (David Taylor, Katelyn Hill), **OC SANDS** (Pete LoPresti, Sam Abraham), **LGNABNB** (Michael DeSanti), **SDB&B** (mgr Hoppscotch LLC; agent Craig Applegate), **LA HABRA B&B** (LoPresti, Abraham), **CCB&B** (Craig Applegate, CEO per LinkedIn).
+- ~18 of 25 named franchisee LLCs returned **no public record** (mostly un-indexed 2024–25 stubs) — GAP.
+- **Two operator clusters:** (1) **Blacktop Restaurant Group, Inc.** — Clayton Wheeler + Craig Applegate, first B&B franchisee (2013), SD North County (CCB&B, SDB&B). (2) **BBRG/BNB cluster** — Crutchfield, Powers, DeSanti, LoPresti, Abraham, Mark Dunn, Adam Brohimer — brought B&B to Orange County (2010); LGNABNB, La Habra B&B, OC Sands, plus siblings Bristolbnb LLC, BNB Lake Forest LLC.
 
-### Store-count reconciliation (Track 8)
-- **All eight roster-only stores appear OPEN** with live third-party listings: Huntington Beach, Costa Mesa, Lake Forest, Thousand Oaks/Westlake Village, Santa Ana, Cypress, Tempe AZ, and **San Clemente (979 Avenida Pico — confirmed open)**.
-- Two carry a **named franchisee operator**: **John Hubbard** (Hubb Management Group LLC) at Thousand Oaks; **Mike Williams** at Cypress.
-- **No CA/AZ chain location** found flagged "permanently closed."
-- Year data points: founded **1979** (Tom Powers, Del Mar); **8 restaurants in 2015**; owners named in 2021 as **Craig Applegate & Clayton Wheeler**; **~25 US locations** currently (undated aggregator). GAP: web.archive.org host-blocked, so no clean year-by-year archived roster.
+### IP (Track 4)
+- Full five-mark JJ&N portfolio confirmed (above). GAPs: USPTO Assignment Center, TSDR file wrapper (specimens/first-use), CA state reg 66474 (1979) — all JS/blocked.
 
-### Employment / labor (Track 1) — PENDING (agent running)
-### Franchisee-entity managers/members (Track 4) — PENDING (agent running)
-### Courts / bankruptcy / Coastal Carlsbad entity (Track 7) — PENDING (agent running)
+### Courts (Track 7)
+- **Rosen v. JJ&N Enterprises, Inc.** exists (UniCourt index): filed 2011-08-09, SD Superior (Central), Personal Injury–Other, **Disposed–Dismissed with prejudice**; plaintiff Kenneth Rosen. Docket number itself not obtained (405 block). SEARCH-INFERRED.
+- **Miami-Dade 2024-010471-CA-01 (BBRG, LLC v. Viso): EXCLUDE the Del Mar entity.** Plaintiff "BBRG, LLC" is the **Florida "Bacon Bitch" group** (Viso = Queens Hospitality/Bacon Bitch; "BBRG, LLC" owns the *Bacon Bitch* mark Reg 5185010; Florida cluster BBRG Miami Beach/Orlando/TR LLC). SEARCH-INFERRED (strong).
+- No public bankruptcy record for Powers, DeSanti, Crutchfield, or the entities (PACER not usable — GAP).
 
-## C. Preliminary answers to the brief's questions (updated as agents report)
+### Store reconciliation (Track 8)
+- **All eight roster-only stores appear OPEN** (Huntington Beach, Costa Mesa, Lake Forest, Thousand Oaks, Santa Ana, Cypress, Tempe AZ, San Clemente). Named operators: **John Hubbard/Hubb Management Group LLC** (Thousand Oaks); **Mike Williams** (Cypress).
+- No CA/AZ location flagged "permanently closed." Chain: founded 1979 (Powers); **8 stores in 2015**; ~25 now. Wayback host-blocked → no clean per-year roster.
 
-- **Q2 (Clayton Wheeler entities):** Wheeler is named (with Craig Applegate) as a Board & Brew **owner/leader** as of 2021 (whatnow.com). Specific LLC memberships pending SOS agent.
-- **Q3 ("Board & Brew Coastal Carlsbad" entity):** PENDING.
-- **Q6 (HB/Costa Mesa/Lake Forest/Thousand Oaks/Santa Ana/Cypress/Tempe operating records):** YES — all appear in public operating listings; operators named for Thousand Oaks (Hubbard) and Cypress (Williams); others show no operator name in the listing.
-- **Q7 (San Clemente record):** YES — San Clemente store at 979 Avenida Pico confirmed open via Tripadvisor.
-- **Q8 (year-by-year count):** Partial — 1979 founding; 8 in 2015; ~25 now. No archived per-year roster (Wayback blocked).
-- **Q1/Q4/Q5/Q9/Q10:** PENDING agents / GAP portals.
+### Employment / labor (Track 1)
+- **No PAGA notice, wage judgment, NLRB case, or Cal/OSHA citation against any subject surfaced** via search. This is a **null result, recorded as such** (not a clearance): the underlying databases (DOL enforcedata, LWDA PAGA, DLSE, NLRB, OSHA) are JS/portal-gated and were not exhaustively machine-searchable this session — GAP. Note: an OSHA record "Bbrg Tr, Llc" (insp. 1134580.015) is the **Florida Bravo Brio** entity, excluded.
 
-_(This memo is a live checkpoint; sections B/C are completed as the remaining agents report.)_
+### Real property / DFPI / multi-state (Tracks 2, 6, 5)
+- 979 Avenida Pico APN **688-131-22** (OC). Owner of record, recorded deeds/DoT/UCC, and 1212 Camino Del Mar owner: **GAP** (assessor & recorder portals JS/CAPTCHA).
+- DFPI DOCQNET, NASAA EFD, and all six other state franchise registries: **not machine-readable — null/GAP per portal.** FDD vintages 2021 & 2022 confirmed to exist (aggregators); Vettedbiz notes the FDD discloses lawsuits/bankruptcy (lead only; FDD paywalled).
+
+## C. Answers to the brief's questions
+
+1. **Managers/members of each franchisee LLC; shared managers?** Partially determinable. BBRG (Powers/DeSanti/Crutchfield). Recurring managers: **Pete LoPresti** & **Sam Abraham** (OC Sands, La Habra B&B, BNB Restaurant Group); **Mike DeSanti** (BBRG, LGNABNB); **Craig Applegate** (CCB&B, SDB&B). ~18 of 25 LLCs = not determinable from public records this session.
+2. **Entities associated with Clayton Wheeler?** Co-founder of **Blacktop Restaurant Group, Inc.** (with Craig Applegate); first B&B franchisee; franchise co-owner of Del Sur, Pacific Beach, Carlsbad Village, Scripps Ranch, Laguna Niguel (press). No fetchable SOS filing names him a manager of a specific B&B LLC — that link is SEARCH-INFERRED from press.
+3. **Entity behind "Board & Brew Coastal Carlsbad"?** BBB ties the trade name to **CCB&B LLC / Two Rippers LLC** (inc. 2009-01-07; principals David Suor, Robert Surprise; 2675 Gateway Rd #103, Carlsbad). The two EDD liens themselves: not determinable from public records this session.
+4. **Do DeSanti or Crutchfield appear as managers/members?** **Yes — both are managers of BBRG, LLC** (DeSanti also LGNABNB). SEARCH-INFERRED (SOS mirror).
+5. **Who owns 1212 Camino Del Mar & 979 Avenida Pico; recorded debt?** Not determinable from public records this session (assessor/recorder portals JS/blocked). 979 Avenida Pico APN = 688-131-22.
+6. **HB / Costa Mesa / Lake Forest / Thousand Oaks / Santa Ana / Cypress / Tempe in public operating records, under what operator?** Yes — all appear as open in public listings. Operators named: Thousand Oaks = John Hubbard (Hubb Management Group LLC); Cypress = Mike Williams. OC Sands LLC operates the Huntington Beach store (SOS mirror). Others show no operator in the listing.
+7. **Health permit or business license for a San Clemente location?** Health/permit record: not determinable (SD/OC health portals JS). Operating record: **yes** — San Clemente store (979 Avenida Pico) confirmed open (Tripadvisor); run by DeSanti + Crutchfield per press.
+8. **Year-by-year location count from the archive?** Not fully determinable — Wayback host-blocked. Public data points: 1979 founded; **8 stores in 2015**; ~25 now.
+9. **DFPI filings — types, effective/expiration dates?** Not determinable from public records this session (DOCQNET JS). FDD vintages 2021 & 2022 exist per aggregators.
+10. **PAGA notices / wage judgments / labor enforcement?** None surfaced via search; a true clearance requires the JS/portal databases not reachable this session. Recorded as null/GAP, not as "none exist."
