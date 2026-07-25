@@ -47,3 +47,8 @@ DOL,https://enforcedata.dol.gov/,all-subjects,2026-07-25T06:25Z,null,20260725_DO
 LWDA,https://cadir.lwda.ca.gov/,all-subjects,2026-07-25T06:25Z,blocked,20260725_LWDA_all-subjects_PAGA_NULL.txt
 NLRB,https://www.nlrb.gov/search/cases,Board-and-Brew,2026-07-25T06:25Z,null,20260725_NLRB_Board-and-Brew_NULL.txt
 OSHA,https://www.osha.gov/ords/imis/establishment.inspection_detail?id=1134580.015,BBRG-TR-LLC-Florida,2026-07-25T06:25Z,retrieved,20260725_OSHA_exclusion_note.md
+LWDA,https://cadir.my.salesforce-sites.com/PagaSearch,Board-and-Brew-Restaurant-Group-LLC,2026-07-25T06:35Z,retrieved,20260725_LWDA_PAGA-Notices_Findings.md
+LWDA,https://cadir.my.salesforce-sites.com/PagaSearch,OSB-B-LLC,2026-07-25T06:35Z,retrieved,20260725_LWDA_PAGA-Notices_Findings.md
+LWDA,https://cadir.my.salesforce-sites.com/PagaSearch,CYPRESSBNB-LLC,2026-07-25T06:35Z,retrieved,20260725_LWDA_PAGA-Notices_Findings.md
+OSHA,https://www.osha.gov/ords/imis/establishment.html,Board-and-Brew,2026-07-25T06:35Z,null,20260725_LWDA_PAGA-Notices_Findings.md
+DOL,https://data.dol.gov/,all-subjects,2026-07-25T06:35Z,blocked,20260725_LWDA_PAGA-Notices_Findings.md

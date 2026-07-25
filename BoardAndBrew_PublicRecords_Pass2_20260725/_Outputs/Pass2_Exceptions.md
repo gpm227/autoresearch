@@ -34,6 +34,8 @@ The pass-1 Exceptions tab was not available in this environment, so the "eight o
 - **X-5. Two Rippers LLC address.** SOS-mirror principal/mailing address is 23801 Calabasas Rd #2026, Calabasas (LA County) though the store it licenses is in Carlsbad — a mailing-agent address, not the store; flagged so it is not mistaken for a location.
 - **X-6. Clayton Wheeler record gap.** Press consistently names Wheeler as first B&B franchisee / Blacktop co-founder, but no fetchable SOS filing lists him as manager/member of a specific B&B LLC; the bizprofile "Clayton Wheeler" authorized-person page shows unrelated namesakes. Association is press-level only.
 - **X-7. Mike Murphy & SCBNB LLC.** No public record located tying Mike Murphy to any B&B entity; SCBNB LLC (the presumed San Clemente entity) returned no fetchable filing. Both remain unresolved (GAP), not excluded.
+- **X-8. New franchisee entity from PAGA data: CYPRESSBNB LLC.** The Cypress store's PAGA notice (LWDA-CM-1147303-26) names **CYPRESSBNB LLC dba Board and Brew** — an operating entity NOT on the task's franchisee list. Reconcile against the roster (Cypress operator was independently reported as Mike Williams). Added to the record; entity managers not yet retrieved (SOS blocked).
+- **X-9. OSB&B, LLC PAGA location.** OSB&B is the Oceanside licensee on the ABC table, but its PAGA notice (LWDA-CM-922795-22) lists the employer location as **Cardiff-by-the-Sea (92007)** and escalated to San Diego Superior case 37-2023-00005528-CU-OE-CTL. Address basis of the filing differs from the ABC store city — noted, not reconciled.
 
 ## 3. Ambiguities resolved by reasonable default (unattended-run choices)
 
