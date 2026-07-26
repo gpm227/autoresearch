@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board &amp; Brew — Operator Terms</title>
+<style>
+  :root{
+    --paper:#F4F3EF; --card:#FDFDFB; --ink:#23272E; --muted:#6E6A61;
+    --line:#DCD8CE; --line-soft:#E7E4DC;
+    --act-fg:#2E5C7E; --act-bg:#E3EDF5;
+    --win-fg:#1F6B47; --win-bg:#E1EFE7;
+    --walk-fg:#8E2C25; --walk-bg:#F6E3E0;
+    --display:"Charter","Bitstream Charter","Sitka Text",Cambria,Georgia,serif;
+    --body:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#17191D; --card:#1F2226; --ink:#E9E7E1; --muted:#9A968C;
+      --line:#34383F; --line-soft:#2A2E34;
+      --act-fg:#7FB0D6; --act-bg:#1B2A38;
+      --win-fg:#6CC49A; --win-bg:#16301F;
+      --walk-fg:#E08A80; --walk-bg:#37201D;
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#F4F3EF; --card:#FDFDFB; --ink:#23272E; --muted:#6E6A61;
+    --line:#DCD8CE; --line-soft:#E7E4DC;
+    --act-fg:#2E5C7E; --act-bg:#E3EDF5;
+    --win-fg:#1F6B47; --win-bg:#E1EFE7;
+    --walk-fg:#8E2C25; --walk-bg:#F6E3E0;
+  }
+  :root[data-theme="dark"]{
+    --paper:#17191D; --card:#1F2226; --ink:#E9E7E1; --muted:#9A968C;
+    --line:#34383F; --line-soft:#2A2E34;
+    --act-fg:#7FB0D6; --act-bg:#1B2A38;
+    --win-fg:#6CC49A; --win-bg:#16301F;
+    --walk-fg:#E08A80; --walk-bg:#37201D;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--body); font-size:15px; line-height:1.5;
+    -webkit-font-smoothing:antialiased; padding:52px 24px 64px;
+  }
+  .wrap{max-width:720px;margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted); margin:0 0 12px;
+  }
+  h1{
+    font-family:var(--display); font-weight:600;
+    font-size:clamp(26px,4.5vw,34px); line-height:1.15;
+    letter-spacing:-.01em; margin:0 0 12px; text-wrap:balance;
+  }
+  .lede{font-size:16px; color:var(--muted); max-width:60ch; margin:0 0 32px}
+  .lede b{color:var(--ink); font-weight:600}
+  .sec{
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted);
+    margin:36px 0 14px; display:flex; align-items:center; gap:14px;
+  }
+  .sec::after{content:""; flex:1; height:1px; background:var(--line)}
+  .fall{display:flex; flex-direction:column}
+  .step{
+    display:grid; grid-template-columns:52px 1fr; gap:0 16px;
+    padding:14px 0 16px; border-top:1px solid var(--line-soft);
+  }
+  .step:first-child{border-top:none; padding-top:4px}
+  .step .no{
+    font-family:var(--display); font-weight:600; font-size:24px;
+    color:var(--win-fg); line-height:1.2; font-variant-numeric:tabular-nums;
+  }
+  .step h3{font-family:var(--display); font-weight:600; font-size:16.5px; line-height:1.3; margin:0 0 4px}
+  .step p{margin:0; font-size:14px; color:var(--muted); max-width:62ch}
+  .step p b{color:var(--ink); font-weight:600}
+  .foot{
+    margin:40px 0 0; padding-top:16px; border-top:1px solid var(--line);
+    font-size:13px; color:var(--muted);
+  }
+  @media print{ body{padding:0; background:#fff} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <p class="eyebrow">Gart only · proposed terms · Board &amp; Brew platform</p>
+  <h1>Operator terms: Greg and Kirk</h1>
+  <p class="lede">Greg and Kirk source, structure, and close the acquisition, then operate the holdco through the succession. Terms below are proposed ranges for the fee letter and holdco agreement, negotiated with Gart. This document never reaches the seller side.</p>
+
+  <p class="sec">Compensation</p>
+  <div class="fall">
+    <div class="step">
+      <span class="no">1</span>
+      <div>
+        <h3>Diligence work fees</h3>
+        <p><b>$12.5K to $17.5K per month, each</b>, from the approved deal budget, payable monthly from letter signature. Expenses at cost. Work fees credit 100% against the closing fee. If a gate fails, fees stop with the budget.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="no">2</span>
+      <div>
+        <h3>Closing fee</h3>
+        <p><b>2% of total consideration at each closing</b>, paid at funding, less credited work fees. Covers sourcing, structuring, negotiation, and execution. On the slow build it pays per closing as each one funds.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="no">3</span>
+      <div>
+        <h3>Management fee</h3>
+        <p><b>$250K per year combined</b> plus expenses, from the holdco, reviewed annually. Sized to keep holdco overhead under 10% of royalty revenue. Covers running the renewal calendar, franchisee relations alongside Tom, store acquisitions, lender reporting, and the amended FDD program.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="no">4</span>
+      <div>
+        <h3>The promote</h3>
+        <p><b>20% of distributions and exit proceeds above return of Gart's capital plus an 8% preferred</b>, split between Greg and Kirk per their separate agreement. Structured as a profits interest at grant, targeting capital gain treatment. Vests over the succession period, accelerates on a sale of the platform. Co invest rights alongside Gart at cost.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="sec">Roles</p>
+  <div class="fall">
+    <div class="step">
+      <span class="no">G</span>
+      <div>
+        <h3>Greg · managing operator</h3>
+        <p>Leads the transaction and the holdco. Owns the economic grid, the seller negotiations, the lender relationship, the renewal calendar, and reporting to Gart.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="no">K</span>
+      <div>
+        <h3>Kirk · operating partner</h3>
+        <p>Owns the bottom up store audit, the per store schedule, store level economics, and operations post close: franchisee support, the expansion pipeline, and real estate execution.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="sec">Guardrails</p>
+  <div class="fall">
+    <div class="step">
+      <span class="no">·</span>
+      <div>
+        <h3>Subordination</h3>
+        <p>The promote sits behind LC repayment and Gart's preferred. No fees on Gart's capital draws. Management fee deferrable if debt service coverage falls below the lender covenant.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="no">·</span>
+      <div>
+        <h3>Gart consent rights</h3>
+        <p>Acquisitions above a set threshold, new debt, affiliate transactions, changes to the operator terms, and any sale of the platform. Everything touching the deal team prices at arm's length and gets documented.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="no">·</span>
+      <div>
+        <h3>Tax</h3>
+        <p>Work and management fees are ordinary income. The promote targets capital gain as a profits interest, subject to the holding period rules. Counsel papers the grants before closing.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Proposed terms, locked in the fee letter and holdco agreement at week one. Splits between Greg and Kirk sit in their separate agreement. Companion documents: the asset summary and acquisition plan, and the deal flowchart.</p>
+</div>
+</body>
+</html>
