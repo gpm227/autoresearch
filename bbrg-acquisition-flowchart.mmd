@@ -28,7 +28,9 @@ flowchart LR
     B5 -- "Holdout" --> B6["Patience:<br/>first to sell wins"] --> B7
     B7 --> B8(["<b>OUTCOME</b><br/>same platform<br/>6–18 mo slower"])
 
-    OA -- "Transfers blocked / ROFR · hard" --> C4["<b>FIVE-PARTY CLOSE</b><br/>Bret &amp; Mike in early<br/>everyone signs same day"] --> C5["Renewal calendar<br/>store buys, real estate"] --> C6(["<b>OUTCOME</b><br/>same platform<br/>all-or-nothing day"])
+    OA -- "Transfers blocked / ROFR · hard" --> C4["<b>FIVE-PARTY CLOSE</b><br/>Tom + Bret + Mike + JJ&amp;N + buyer<br/>one agreement · escrowed signatures<br/>omnibus exclusivity + drop-dead date"]
+    C4 -- "all five sign by the date" --> C5["Renewal calendar<br/>store buys, real estate"] --> C6(["<b>OUTCOME</b><br/>same platform<br/>all-or-nothing day"])
+    C4 -- "stalling past drop-dead:<br/>offer steps down, then dies" --> W3(["REPRICE<br/>or WALK"])
 
     classDef start fill:#23272E,stroke:#23272E,color:#F4F3EF
     classDef gate fill:#F4EAD3,stroke:#8A6420,color:#4A3510,stroke-width:1.5px
@@ -42,4 +44,4 @@ flowchart LR
     class DOCS,A4,B3,C4 action
     class A5,B4,B6,B7,C5 step
     class A6,B8,C6 outcome
-    class W1,W2 walk
+    class W1,W2,W3 walk
