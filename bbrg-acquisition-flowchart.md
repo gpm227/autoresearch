@@ -50,18 +50,16 @@ flowchart LR
     class W1,W2 walk
 ```
 
-## Diligence notes — the paper behind each box
+## Diligence notes — justifies the action, or causes risk
 
-The FDD is the map to every gate, but it only *summarizes*; the underlying contracts control.
+Every FDD reference does one of two jobs: **justifies the action** (the disclosure that makes the move right) or **causes risk** (the obligation or defect the move creates). The FDD only summarizes; the underlying contracts control.
 
-| Section | Paper to pull | FDD basis · risk |
+| Section | Justifies the action | Causes risk |
 |---|---|---|
-| **Gate 1 · Economics** | LOI with earnout schedule; Item 21 audited financials; Item 20 outlet history | The earnout is underwritten by the royalty stream the FDD proves up. If Item 21 can't support $20M cash, the earnout is the bridge — an all-cash demand means the seller's own numbers don't carry the price. That justifies the walk. |
-| **Document pull** | Operating agreement; JJ&N–BBRG trademark license; FAs + renewal files | FDD Items 1, 13, and 17 point at all three, but disclosure summaries aren't contracts. Every downstream branch turns on the originals — pull before pricing. |
-| **Gate 2 · Trademarks** | The license; USPTO registrations; each FA's mark-grant clause | Item 13 must disclose BBRG doesn't own its marks and every license condition. A license terminable on change of control means the acquisition could strip the brand — royalty contracts with nothing behind them, re-disclosed in an amended Item 13. Hence the hard walk unless JJ&N sells or re-papers perpetual + CoC-proof. |
-| **Gate 3 · Operating agreement** | OA transfer article — drag, tag, ROFR, blocked transfers; member consents | Any track triggers Item 1 (new owner) and Item 21 (new financials) amendments before new franchise sales. Confirm FAs let the franchisor assign freely — a franchisee consent right in Item 17's contract terms changes every track's math. |
-| **Track A · one signing** | — | One closing = one disclosure event (single Item 1/21 amendment). The 4%→5% step lands only at renewal per FA terms, disclosed in Items 5–6 of the successor FDD — the renewal calendar *is* the revenue plan. |
-| **Track B · control first** | — | Operating with a 45% minority: any dispute lands in your own Item 3 (litigation), in front of every prospect. Partner stores transfer as franchisee transfers under Item 17 (consent, ROFR, fee). Patience beats a disclosable lawsuit — first to sell wins. |
-| **Track C · five-party close** | — | ROFRs and blocked transfers put every signature on the critical path; OA notice periods set the closing clock. No lawful partial fallback, so Bret & Mike come in early. Post-close, same single Item 1/21 amendment as Track A. |
-
-Every track ends the same way: renewals run on Item 17's windows and deadlines, store buys clear as franchisee transfers under the same item, and the royalty step-up appears in Items 5–6 of the successor FDD.
+| **Gate 1 · Economics** | Item 21 is the only provable earnings base; if it can't support $20M cash, the earnout is the bridge. Tom refusing it means his own FDD doesn't carry his price — the walk is justified by the disclosures, not posture. | The earnout rides on future royalties, and Item 20's outlet table shows how fragile that stream is — closures shrink the earnout after signing. Price it off Item 20's trend, not the current store count. |
+| **Document pull** | Items 1, 13, and 17 name exactly these three contracts — OA, JJ&N license, FAs — as what controls the deal. That's why these documents come first. | Stopping at the summaries: the FDD updates annually, so anything signed since its issuance date isn't in it. Pricing off summaries imports their staleness. |
+| **Gate 2 · Trademarks** | Item 13 must disclose that BBRG licenses rather than owns its marks, plus every license condition. That disclosed dependency elevates the marks to a gate with its own walk-away. | Closing on a license terminable at change of control means the acquisition can strip the brand: royalty contracts with nothing behind them, an amended Item 13 confessing it, and rescission exposure. Hence the non-negotiable walk. |
+| **Gate 3 · Operating agreement** | The OA's transfer article dictates which closing structure is legally available; Item 17's contract terms confirming the franchisor can assign freely is what clears an equity close at all. | Any track triggers Item 1 and Item 21 amendments — and new franchise sales go dark until the amended FDD issues. A hidden franchisee consent right puts every store on the critical path. |
+| **Track A · one signing** | The drag-along is the legal authority to compel the minority into one deal — one closing, one Item 1/21 amendment, shortest sales blackout. | The 4%→5% step cannot be imposed mid-term — forcing it early breaches the FAs and lands in Item 3. It arrives only at renewal, disclosed in Items 5–6 of the successor FDD. |
+| **Track B · control first** | Unrestricted transfers mean no minority consent is needed to sell control — Close 1 is lawful day one, and the blended offer is made from control. | Operating with a 45% minority: any dispute becomes Item 3 litigation in your own FDD. Partner stores transfer under Item 17 conditions (consent, ROFR, fee). A disclosable lawsuit costs more than 6–18 months. |
+| **Track C · five-party close** | With transfers blocked or ROFR'd, a partial close is void, not slow — the simultaneous five-party signing is the only structure the OA permits. | Every signature is on the critical path; one holdout kills the closing, and the OA's ROFR notice periods set the clock. Worst execution risk of the three tracks. |
