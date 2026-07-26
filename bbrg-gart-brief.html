@@ -130,6 +130,22 @@
     background:var(--walk-bg); border-radius:3px; padding:3px 8px;
   }
 
+  .plainrow{display:flex; flex-direction:column; gap:10px; margin:0 0 6px}
+  .plainrow p{margin:0; font-size:14.5px; color:var(--muted); max-width:68ch}
+  .plainrow p b{color:var(--ink); font-weight:600}
+
+  .doclist{margin:10px 0 0; padding:0; list-style:none; counter-reset:doc; max-width:62ch}
+  .doclist li{
+    counter-increment:doc; display:flex; align-items:baseline; gap:12px;
+    padding:8px 2px; font-size:13.5px; color:var(--muted);
+    border-top:1px solid var(--line-soft);
+  }
+  .doclist li::before{
+    content:counter(doc,decimal-leading-zero);
+    font-family:var(--mono); font-size:11px; color:var(--act-fg); flex:none;
+  }
+  .doclist li b{color:var(--ink); font-weight:600}
+
   .fall{display:flex; flex-direction:column}
   .step{
     display:grid; grid-template-columns:52px 1fr; gap:0 16px;
@@ -174,6 +190,15 @@
   </div>
   <p class="statnote">Audited (Exhibit B, <b>Item 21</b>): FY25 revenue of $3.0M against roughly $700K of operating expense, $2.6M of operating cash flow, no debt. From FY24 to FY25, royalties went from $2.39M to $2.76M and net income from $2.20M to $2.61M. BBRG makes no Item 19 performance representations, so the audits and store level records are the underwriting base. We want it that way. <b>The pricing variable:</b> how much of the royalty base still pays 4%. Every legacy point is a contractual 25% raise sitting on the renewal calendar.</p>
 
+  <p class="sec">The deal in plain words</p>
+  <div class="plainrow">
+    <p><b>What this is.</b> Board &amp; Brew is a Southern California sandwich and craft beer brand with 33 locations. 26 belong to franchisees who pay the parent company a cut of sales every week. Last year that produced about $2.8M in royalties and $2.6M in profit on a tiny cost base, with audited books and zero franchisee departures in three years.</p>
+    <p><b>What we buy.</b> The whole machine, in three pieces: Tom Powers' controlling 55% of BBRG, the brand name itself (held by Tom's separate company JJ&amp;N), and eventually the partners' 45% (Bret and Mike). We never hold one piece without the others locked, because each piece alone is worth far less than the bundle.</p>
+    <p><b>Why income grows by itself.</b> New stores pay 5% of sales. Older stores pay 4%, but their contracts require them to accept current terms when they renew. Revenue steps up store by store on dates already written into signed contracts. Nobody has to negotiate a raise.</p>
+    <p><b>What it costs Gart.</b> Little up front. Tom wants to be paid over years because it cuts his taxes, and paid over years means small checks at closing. The weekly royalty stream then pays off most of the purchase itself. Gart money only moves when a closing is certain.</p>
+    <p><b>If the partners won't sell.</b> Nothing forces them, and we don't pretend otherwise. After we own control and the brand, their 45% pays them nothing, nobody else wants it, and their own restaurants renew through us. Then we make a fair offer with the same tax treatment Tom got. They sell because holding is worse.</p>
+  </div>
+
   <p class="sec">What we refuse · the purgatory states</p>
   <div class="purg">
     <div class="dead">
@@ -207,9 +232,18 @@
     <div class="g">
       <span class="no">G2</span>
       <div>
-        <h3>Paper. Three documents in hand before we price anything</h3>
-        <p>The operating agreement, the JJ&amp;N trademark license, and every franchise agreement with its renewal file. The FDD names all three and attaches <b>none of them</b>. Item 22 carries only the form FA and the ADA. The FA files also give us the store by store royalty rate and renewal clause schedule, and that schedule is the pricing model.</p>
-        <div class="cites"><span class="cite">Item 22</span><span class="cite">Item 1</span><span class="cite">Item 13</span><span class="cite">Item 17</span></div>
+        <h3>Paper. The exact documents, in hand before we price anything</h3>
+        <p>The FDD names the controlling contracts and attaches <b>none of them</b>. Item 22 carries only the form FA and the ADA. This is the request list, in priority order:</p>
+        <ol class="doclist">
+          <li><span><b>BBRG, LLC operating agreement</b> with every amendment, plus any side or buy sell agreements among Tom, Bret, and Mike. We read the transfer article (drag, tag, ROFR, blocked transfers) and the manager appointment and voting rules.</span></li>
+          <li><span><b>JJ&amp;N to BBRG trademark license</b> with all amendments. Term start date, renewal mechanics, termination triggers, change of control language, and assignability.</span></li>
+          <li><span><b>JJ&amp;N itself:</b> cap table and formation documents, plus every mark it owns beyond reg. 5443521. If Bret and Mike own any piece of JJ&amp;N, the closing sequence changes.</span></li>
+          <li><span><b>All 26 executed franchise agreements</b> with amendments, side letters, and renewal files. Output: a store by store schedule of royalty rate, expiry date, renewal clause type, and transfer clause. That schedule is the pricing model.</span></li>
+          <li><span><b>The affiliate store entities</b> (SCBNB and the rest): who owns each of the 7 company stores and what paper ties them to the brand.</span></li>
+          <li><span><b>The ADA book:</b> every signed area development agreement behind the $583K of deferred revenue, with development schedules and territory grants we would inherit.</span></li>
+          <li><span><b>The money side items:</b> vendor rebate contracts (about $296K a year), gift card program terms ($392K liability), creative fund accounting ($353K liability), and the 2025 legal settlement file.</span></li>
+        </ol>
+        <div class="cites"><span class="cite">Item 22</span><span class="cite">Item 1</span><span class="cite">Item 13</span><span class="cite">Item 17</span><span class="cite">Exhibit B</span></div>
       </div>
     </div>
     <div class="g">

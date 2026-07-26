@@ -107,6 +107,34 @@
   .sw-win{background:#E1EFE7;border-color:#1F6B47}
   .sw-walk{background:#F6E3E0;border-color:#8E2C25}
 
+  .stats{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line);
+    border-radius:6px; overflow:hidden; margin:0 0 10px;
+  }
+  .stat{background:var(--card); padding:14px 16px}
+  .stat .n{
+    font-family:var(--display); font-weight:600; font-size:21px;
+    font-variant-numeric:tabular-nums; display:block;
+  }
+  .stat .l{font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--muted)}
+  .statnote{font-size:12.5px; color:var(--muted); margin:0 0 24px; max-width:76ch}
+  .statnote b{color:var(--ink)}
+  @media (max-width:640px){ .stats{grid-template-columns:repeat(2,1fr)} }
+
+  .doclist{margin:8px 0 0; padding:0; list-style:none; counter-reset:doc}
+  .doclist li{
+    counter-increment:doc; display:flex; align-items:baseline; gap:12px;
+    padding:7px 2px; font-size:13.5px; color:var(--muted);
+    border-top:1px solid var(--line-soft);
+  }
+  .doclist li::before{
+    content:counter(doc,decimal-leading-zero);
+    font-family:var(--mono); font-size:11px; color:var(--act-fg); flex:none;
+  }
+  .doclist li b{color:var(--ink); font-weight:600}
+
   /* the diagram sits on a printed-exhibit plate: paper-toned in both themes */
   .plate{
     background:#F4F3EF;
@@ -189,6 +217,14 @@
     <p class="lede">Gart's letter of credit is issued and Tom has been pitched. From here the deal passes through three gates — economics, trademarks, then the operating agreement. <b>The OA answer, not the price, sets the closing structure.</b></p>
   </header>
 
+  <div class="stats">
+    <div class="stat"><span class="n">$2.61M</span><span class="l">FY25 net income</span></div>
+    <div class="stat"><span class="n">$2.76M</span><span class="l">FY25 royalties · +16%</span></div>
+    <div class="stat"><span class="n">33</span><span class="l">Outlets · 0 churn</span></div>
+    <div class="stat"><span class="n">~89¢</span><span class="l">Margin per new $1</span></div>
+  </div>
+  <p class="statnote">Audited (Exhibit B, <b>Item 21</b>): FY25 revenue $3.0M on roughly $700K of operating expense, $2.6M operating cash flow, no debt. FY24 to FY25: royalties $2.39M to $2.76M, net income $2.20M to $2.61M. No Item 19 performance representations, so the audits and store level records are the underwriting base. <b>The pricing variable:</b> how much of the royalty base still pays 4%. Every legacy point is a contractual 25% raise sitting on the renewal calendar.</p>
+
   <ul class="legend">
     <li><span class="swatch sw-gate"></span>Decision gate</li>
     <li><span class="swatch sw-act"></span>Closing action</li>
@@ -222,8 +258,18 @@
       <span class="tag tag-act">Document pull · before diligence goes further</span>
       <h3>The two documents the deal turns on aren't in the FDD</h3>
       <dl>
-        <dt>Paper to pull</dt>
-        <dd class="q">BBRG operating agreement; JJ&amp;N–BBRG trademark license; every franchise agreement + renewal file.</dd>
+        <dt>Paper to pull · the exact request list</dt>
+        <dd class="q">
+          <ol class="doclist">
+            <li><span><b>BBRG operating agreement</b> + all amendments and any member side or buy sell agreements. Read the transfer article and the manager voting rules.</span></li>
+            <li><span><b>JJ&amp;N to BBRG trademark license</b> + amendments: term start, renewal mechanics, termination triggers, change of control, assignability.</span></li>
+            <li><span><b>JJ&amp;N cap table and formation docs</b>, plus all marks beyond reg. 5443521. If Bret and Mike own any of JJ&amp;N, the closing sequence changes.</span></li>
+            <li><span><b>All 26 executed FAs</b> + amendments, side letters, renewal files. Output: per store schedule of royalty rate, expiry, renewal clause type, transfer clause.</span></li>
+            <li><span><b>Affiliate store entities</b> (SCBNB et al.): ownership of the 7 company stores and the paper tying them to the brand.</span></li>
+            <li><span><b>The ADA book</b> behind the $583K deferred revenue: development schedules and territory grants we would inherit.</span></li>
+            <li><span><b>Money side:</b> vendor rebate contracts (~$296K/yr), gift card terms ($392K liability), creative fund accounting ($353K liability), 2025 settlement file.</span></li>
+          </ol>
+        </dd>
         <dt class="jus">Justifies the action</dt>
         <dd><span class="fdd">Item 22</span> attaches exactly two contracts: the form Franchise Agreement and the ADA. The operating agreement and the JJ&amp;N Trademark License are <b>not exhibits</b> — the FDD names them (<span class="fdd">Item 1</span>: "JJN… owns the Board and Brew trademarks and has authorized us to license these marks"; <span class="fdd">Item 13</span> summarizes the license) but does not contain them. The two documents Gates 2 and 3 turn on are precisely the two the FDD doesn't carry.</dd>
         <dt class="rsk">Causes risk</dt>
@@ -287,6 +333,30 @@
         <dd>When the OA blocks transfers or hangs a ROFR on them, a partial close isn't slow — it's void. The five parties are already identified in the FDD itself: Tom Powers, Bret Crutchfield, and Michael DeSanti (<span class="fdd">Item 2</span>), JJ&amp;N as mark owner (<span class="fdd">Item 1</span>), and the buyer. <span class="fdd">Item 1</span> is also why Bret &amp; Mike must be in the room early: the seven "company-owned" outlets are held by <i>affiliates under common ownership</i> — those stores belong to the partners' entities, not to BBRG, and don't come along automatically with the franchisor.</dd>
         <dt class="rsk">Causes risk</dt>
         <dd>Every signature sits on the critical path — one holdout kills the whole closing, and the OA's ROFR notice periods set the clock whether you start them deliberately or not. Post-close the disclosure burden matches Track A (one <span class="fdd">Item 1</span>/<span class="fdd">Item 21</span> amendment), but execution risk is the worst of the three tracks: the affiliate store entities (SCBNB et al.) each need their own purchase paper on the same day.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <p class="notes-head">Capital and structure · how the money moves</p>
+  <div class="notes">
+    <div class="note">
+      <span class="tag tag-act">Capital plan · two locked outcomes</span>
+      <h3>Minimal Gart dollars under either shape</h3>
+      <dl>
+        <dt class="jus">Fast (drag exists)</dt>
+        <dd>100% closes day one, but the check stays small: most of the price is the installment note and earnout Tom wants for tax reasons. The royalty stream services the paper at roughly 89 cents of margin per dollar, and the earnout sits junior to LC repayment.</dd>
+        <dt class="jus">Patient (no drag)</dt>
+        <dd>Close 1 is the small check: Tom's 55% plus JJ&amp;N plus the license. The sweep of the 45% is funded by retained distributions and step up royalties, with a second Gart draw only after Bret and Mike sign. The second dollar never chases a holdout. Under both shapes, every dollar draws against a cross conditioned closing that cannot leave a partial state.</dd>
+      </dl>
+    </div>
+    <div class="note">
+      <span class="tag tag-act">Seller structure · tax friendly by design</span>
+      <h3>Tom's money arrives as capital gain, on his schedule</h3>
+      <dl>
+        <dt class="jus">The structure</dt>
+        <dd>Equity sale of membership interests = long term capital gain (<span class="fdd">IRC §741</span>). Earnout papered as contingent purchase price on the installment method, taxed as payments land, with stated AFR interest (<span class="fdd">§453</span>, <span class="fdd">§483/§1274</span>). Marks money, if JJ&amp;N sells, is a fixed price with complete transfer since contingent trademark payments are ordinary income (<span class="fdd">§1253</span>). Optional §721 rollover keeps him aligned and deferred.</dd>
+        <dt class="rsk">The two rules that protect it</dt>
+        <dd>The earnout must never depend on Tom staying employed, or it becomes ordinary compensation plus payroll tax. And the buyer side pays for all of it: buying 100% of the interests is an asset purchase for tax (<span class="fdd">Rev. Rul. 99-6</span>) with a step up amortized over 15 years (<span class="fdd">§197</span>) against about $0.4M of book equity. Deal design points, not tax advice; tax counsel signs off before anything is signed.</dd>
       </dl>
     </div>
   </div>
