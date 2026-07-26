@@ -64,20 +64,27 @@
   }
   .lede{font-size:16px; color:var(--muted); max-width:60ch; margin:0 0 26px}
   .lede b{color:var(--ink); font-weight:600}
+  .cite{
+    font-family:var(--mono); font-size:11px;
+    background:var(--line-soft); border-radius:3px; padding:1px 6px;
+    white-space:nowrap; color:var(--ink);
+  }
 
   /* stat strip */
   .stats{
     display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
     background:var(--line); border:1px solid var(--line);
-    border-radius:6px; overflow:hidden; margin:0 0 40px;
+    border-radius:6px; overflow:hidden; margin:0 0 10px;
   }
   .stat{background:var(--card); padding:14px 16px}
   .stat .n{
-    font-family:var(--display); font-weight:600; font-size:22px;
+    font-family:var(--display); font-weight:600; font-size:21px;
     font-variant-numeric:tabular-nums; display:block;
   }
   .stat .l{font-family:var(--mono); font-size:10px; letter-spacing:.1em;
     text-transform:uppercase; color:var(--muted)}
+  .statnote{font-size:12.5px; color:var(--muted); margin:0 0 36px}
+  .statnote b{color:var(--ink)}
 
   .sec{
     font-family:var(--mono); font-size:11px; letter-spacing:.14em;
@@ -86,50 +93,60 @@
   }
   .sec::after{content:""; flex:1; height:1px; background:var(--line)}
 
-  /* waterfall */
-  .fall{display:flex; flex-direction:column}
-  .step{
+  /* purgatory refusals */
+  .purg{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+  .dead{
+    background:var(--card); border:1px solid var(--line);
+    border-top:3px solid var(--walk-fg); border-radius:6px; padding:14px 16px;
+  }
+  .dead .k{
+    font-family:var(--mono); font-size:10px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--walk-fg);
+    display:block; margin-bottom:6px;
+  }
+  .dead h3{font-family:var(--display); font-weight:600; font-size:15.5px; margin:0 0 5px; line-height:1.3}
+  .dead p{margin:0; font-size:13px; color:var(--muted)}
+
+  /* gates path */
+  .gates{display:flex; flex-direction:column}
+  .g{
     display:grid; grid-template-columns:52px 1fr; gap:0 16px;
     padding:16px 0 18px; border-top:1px solid var(--line-soft);
   }
-  .step:first-child{border-top:none; padding-top:4px}
-  .step .no{
-    font-family:var(--display); font-weight:600; font-size:30px;
-    color:var(--win-fg); line-height:1; padding-top:2px;
-    font-variant-numeric:tabular-nums;
+  .g:first-child{border-top:none; padding-top:4px}
+  .g .no{
+    font-family:var(--display); font-weight:600; font-size:26px;
+    color:var(--gate-fg); line-height:1.15; font-variant-numeric:tabular-nums;
   }
-  .step h3{
+  .g.close .no{color:var(--win-fg)}
+  .g h3{
     font-family:var(--display); font-weight:600; font-size:17.5px;
     line-height:1.3; margin:0 0 4px; text-wrap:balance;
   }
-  .step p{margin:0; font-size:14px; color:var(--muted); max-width:60ch}
-  .step p b{color:var(--ink); font-weight:600}
-  .cite{
-    font-family:var(--mono); font-size:11px;
-    background:var(--line-soft); border-radius:3px; padding:1px 6px;
-    white-space:nowrap; color:var(--ink);
+  .g p{margin:0; font-size:14px; color:var(--muted); max-width:62ch}
+  .g p b{color:var(--ink); font-weight:600}
+  .g .cites{grid-column:2; margin-top:8px; display:flex; flex-wrap:wrap; gap:6px}
+  .walkline{
+    display:inline-block; margin-top:8px;
+    font-family:var(--mono); font-size:10.5px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--walk-fg);
+    background:var(--walk-bg); border-radius:3px; padding:3px 8px;
   }
-  .step .cites{grid-column:2; margin-top:8px; display:flex; flex-wrap:wrap; gap:6px}
 
-  /* plain cards */
-  .plain{
-    background:var(--card); border:1px solid var(--line); border-radius:6px;
-    padding:18px 20px; margin-bottom:12px;
+  /* waterfall condensed */
+  .fall{display:flex; flex-direction:column}
+  .step{
+    display:grid; grid-template-columns:52px 1fr; gap:0 16px;
+    padding:13px 0 15px; border-top:1px solid var(--line-soft);
   }
-  .plain h3{
-    font-family:var(--display); font-weight:600; font-size:16.5px;
-    margin:0 0 6px; text-wrap:balance;
+  .step:first-child{border-top:none; padding-top:4px}
+  .step .no{
+    font-family:var(--display); font-weight:600; font-size:24px;
+    color:var(--win-fg); line-height:1.2; font-variant-numeric:tabular-nums;
   }
-  .plain p{margin:0; font-size:14px; color:var(--muted)}
-  .plain p b{color:var(--ink); font-weight:600}
-  .plain.cond{border-left:3px solid var(--gate-fg)}
-  .plain.lock{border-left:3px solid var(--act-fg)}
-  .plain .k{
-    font-family:var(--mono); font-size:10px; font-weight:700;
-    letter-spacing:.13em; text-transform:uppercase; display:block; margin-bottom:6px;
-  }
-  .plain.cond .k{color:var(--gate-fg)}
-  .plain.lock .k{color:var(--act-fg)}
+  .step h3{font-family:var(--display); font-weight:600; font-size:16px; line-height:1.3; margin:0 0 3px}
+  .step p{margin:0; font-size:13.5px; color:var(--muted); max-width:62ch}
+  .step p b{color:var(--ink); font-weight:600}
 
   .foot{
     margin:40px 0 0; padding-top:16px; border-top:1px solid var(--line);
@@ -138,11 +155,10 @@
 
   @media (max-width:640px){
     .stats{grid-template-columns:repeat(2,1fr)}
+    .purg{grid-template-columns:1fr}
     body{padding-top:32px}
   }
-  @media print{
-    body{padding:0; background:#fff}
-  }
+  @media print{ body{padding:0; background:#fff} }
 </style>
 </head>
 <body>
@@ -150,91 +166,123 @@
 <div class="wrap">
   <header>
     <p class="eyebrow">Pitch brief · for the Garts · Board &amp; Brew (BBRG, LLC)</p>
-    <h1>The royalty machine raises its own rates</h1>
-    <p class="lede">Every number below comes from the seller's own Franchise Disclosure Document (issued February 10, 2026) and the form Franchise Agreement attached to it. The headline: <b>revenue steps up by contract, on a published calendar, without opening a single new store.</b></p>
+    <h1>One path. Four gates. No purgatory.</h1>
+    <p class="lede">Every closing is <b>cross-conditioned</b>: control, marks, and the minority endgame fund together or nothing funds at all. There is no version of this deal where we hold one piece and negotiate for the rest. Every number and clause below is cited to the seller's own FDD (issued February 10, 2026) and its audited financials.</p>
   </header>
 
   <div class="stats">
-    <div class="stat"><span class="n">33</span><span class="l">Outlets · 26 franchised</span></div>
-    <div class="stat"><span class="n">0</span><span class="l">Terminations, 2023–25</span></div>
-    <div class="stat"><span class="n">5% + 1%</span><span class="l">Current royalty + fund</span></div>
-    <div class="stat"><span class="n">3 yrs</span><span class="l">Audited financials</span></div>
+    <div class="stat"><span class="n">$2.61M</span><span class="l">FY25 net income</span></div>
+    <div class="stat"><span class="n">$2.76M</span><span class="l">FY25 royalties · +16%</span></div>
+    <div class="stat"><span class="n">33</span><span class="l">Outlets · 0 churn</span></div>
+    <div class="stat"><span class="n">~89¢</span><span class="l">Margin per new $1</span></div>
+  </div>
+  <p class="statnote">Audited (Exhibit B / <b>Item 21</b>): FY25 revenue $3.0M on ~$0.7M of operating expenses, ~$2.6M operating cash flow, no debt. FY24→FY25: royalties $2.39M→$2.76M, net income $2.20M→$2.61M. BBRG makes no Item 19 performance representations — these audits and store-level records are the underwriting base, which is how it should be. <b>The pricing variable:</b> how much of the royalty base still pays 4% — every legacy point is a contractual 25% raise waiting on the renewal calendar.</p>
+
+  <p class="sec">What we refuse · the purgatory states</p>
+  <div class="purg">
+    <div class="dead">
+      <span class="k">Dead end 1</span>
+      <h3>Marks without the machine</h3>
+      <p>JJ&amp;N's brand in hand but no BBRG: a logo with zero royalty contracts. Nothing to collect. Never buy the marks alone.</p>
+    </div>
+    <div class="dead">
+      <span class="k">Dead end 2</span>
+      <h3>Machine without the marks</h3>
+      <p>BBRG without the license secured: $2.76M of royalties that die store-by-store at each FA expiry — Item 13 says franchisees keep the marks only for their existing terms. A melting annuity.</p>
+    </div>
+    <div class="dead">
+      <span class="k">Dead end 3</span>
+      <h3>Control without an endgame</h3>
+      <p>55% plus a hostile 45% and no contractual sweep: deadlock, and every dispute lands in our own Item 3, in front of every prospect. Control must come with the mechanics that finish the job.</p>
+    </div>
   </div>
 
-  <p class="sec">The waterfall · where money comes from, in order</p>
+  <p class="sec">The one path · four gates, then one closing</p>
+  <div class="gates">
+    <div class="g">
+      <span class="no">G1</span>
+      <div>
+        <h3>Economics — Tom takes the case plus earnout</h3>
+        <p>Price is anchored to the audited stream: cash for what Exhibit B proves, earnout for the step-up. The earnout is collected from the same weekly royalties, <b>junior to LC repayment</b>. If Tom insists on all-cash at $20M+, his own disclosure numbers don't carry the price.</p>
+        <span class="walkline">Fail → walk, before diligence spend</span>
+        <div class="cites"><span class="cite">Item 21 / Exhibit B</span><span class="cite">Item 20</span></div>
+      </div>
+    </div>
+    <div class="g">
+      <span class="no">G2</span>
+      <div>
+        <h3>Paper — the three documents, in hand, before pricing</h3>
+        <p>Operating agreement, JJ&amp;N trademark license, every franchise agreement with its renewal file. The FDD names all three but attaches <b>none of them</b> — Item 22 carries only the form FA and ADA. The FA files also produce the per-store royalty-rate and renewal-clause schedule: the pricing model itself.</p>
+        <div class="cites"><span class="cite">Item 22</span><span class="cite">Item 1</span><span class="cite">Item 13</span><span class="cite">Item 17</span></div>
+      </div>
+    </div>
+    <div class="g">
+      <span class="no">G3</span>
+      <div>
+        <h3>Marks — secured in writing, or nothing closes</h3>
+        <p>Either JJ&amp;N sells the marks into the deal, or the license is re-papered <b>perpetual, change-of-control-proof, and assignable</b>. The disclosed license is already strong — royalty-free, exclusive, renewable at BBRG's option in 10-year terms, mark incontestable since 2023 — and an equity purchase keeps the licensee intact. But "should ride through" is not a closing condition; the signed paper is.</p>
+        <span class="walkline">Fail → walk. Never BBRG without the marks</span>
+        <div class="cites"><span class="cite">Item 13</span><span class="cite">USPTO reg. 5443521</span></div>
+      </div>
+    </div>
+    <div class="g">
+      <span class="no">G4</span>
+      <div>
+        <h3>Structure — the OA picks the closing shape, not the destination</h3>
+        <p>The operating agreement decides only <b>who signs on day one</b>: a drag-along pulls Bret &amp; Mike in at the same table; blocked transfers force all five parties same-day; free transfers mean control closes first and the 45% follows by contract. The franchisee side is already clear — the FAs put "no restriction on our right to assign." Same destination in all three shapes.</p>
+        <div class="cites"><span class="cite">Item 17(j) / FA §12.1</span><span class="cite">Item 2</span></div>
+      </div>
+    </div>
+    <div class="g close">
+      <span class="no">✓</span>
+      <div>
+        <h3>The closing — everything funds together, or nothing funds</h3>
+        <p>One cross-conditioned signing: Tom's 55%, the marks (sale or re-papered license), and — per the OA — the minority same-day or bound into the sweep. The LC is never exposed to a partial state. If the 45% follows later, the sweep runs on contract, not hope: blended offer under <b>NDA / no-shop / short fuse</b>, their two stores pinned by the <b>15-day match right</b> on any bona fide offer, consent required for any equity transfer in a store entity (the "99% sale" can't happen quietly — unapproved transfers are void), and the renewal calendar stepping every legacy store to 5% + 1% on its contractual date.</p>
+        <div class="cites"><span class="cite">FA §12.2(a)–(e)</span><span class="cite">FA §12.3(b)–(d)</span><span class="cite">FA §5.2(c)(vii), (d)</span><span class="cite">Item 17(b)–(c)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="sec">Then the machine runs · where money comes from, in order</p>
   <div class="fall">
     <div class="step">
       <span class="no">1</span>
       <div>
         <h3>Weekly cash from day one</h3>
-        <p>Every store pays <b>5% of gross revenues</b> in royalty plus <b>1% Creative Fund</b> (raisable to 2% on 90 days' notice), collected <b>every Wednesday</b>. Not monthly, not quarterly — the platform cash-flows 52 times a year.</p>
-        <div class="cites"><span class="cite">Item 5</span><span class="cite">Item 6</span></div>
+        <p><b>5% of gross revenues + 1% Creative Fund</b> (raisable to 2% on 90 days' notice), collected every Wednesday — 52 paydays a year. <span class="cite">Items 5–6</span></p>
       </div>
     </div>
     <div class="step">
       <span class="no">2</span>
       <div>
-        <h3>Built-in raises at renewal or expiry — the step-up waterfall</h3>
-        <p>The current form makes renewal conditional: to renew, a franchisee signs the then-current FA, which — in the contract's own capitals — "WILL CONTAIN THE ROYALTY&nbsp;… PAYABLE BY NEW BOARD AND BREW FRANCHISEES" (§5.2(d)), and the franchisor may decline renewal unless the franchisee accepts the customary current terms (§5.2(c)(vii)). For legacy 4% stores, <b>their own signed FA sets the date, not the amount</b>: a current-form renewal clause steps them up at renewal; a same-terms clause defers the step to final expiry, after which continuing at all requires a new agreement at current rates. No rate moves mid-term — and none survives the paper's end. The renewal files tell us each store's date.</p>
-        <div class="cites"><span class="cite">FA §5.2(c)(vii)</span><span class="cite">FA §5.2(d)</span><span class="cite">Item 17(b)–(c)</span></div>
+        <h3>Contractual raises on a published calendar</h3>
+        <p>Renewal requires the then-current form, which "WILL CONTAIN THE ROYALTY… PAYABLE BY NEW… FRANCHISEES." Legacy 4% stores step up at renewal or at expiry — their own FA sets the date, never the amount. No rate moves mid-term; none survives the paper's end. <span class="cite">FA §5.2(d)</span> <span class="cite">Item 17(c)</span></p>
       </div>
     </div>
     <div class="step">
       <span class="no">3</span>
       <div>
-        <h3>Every store sale upgrades the paper too</h3>
-        <p>No store changes hands without our written consent — and consent can be conditioned on the buyer <b>signing the current form</b>, plus a <b>$10,000 transfer fee</b>. Natural turnover converts the system to 5% even between renewals.</p>
-        <div class="cites"><span class="cite">FA §12.2(c)(iv)</span><span class="cite">FA §12.2(b)(vii)</span></div>
+        <h3>Turnover upgrades the paper</h3>
+        <p>Every consented store sale can require the buyer to sign the current form, plus a $10,000 transfer fee. <span class="cite">FA §12.2(c)(iv), (b)(vii)</span></p>
       </div>
     </div>
     <div class="step">
       <span class="no">4</span>
       <div>
-        <h3>We buy stores at market-proven prices</h3>
-        <p>When any franchisee gets a real offer, they must show us <b>every term in writing</b>, and we have <b>15 days to take the same deal ourselves</b>. The match right means store acquisitions happen at prices a third party already validated — never at a hopeful ask.</p>
-        <div class="cites"><span class="cite">FA §12.3(b)–(c)</span><span class="cite">Item 17(n)</span></div>
+        <h3>Store buys at market-proven prices</h3>
+        <p>Any real offer must be shown to us in full, and we can take the same deal within 15 days — acquisitions at prices a third party already validated. <span class="cite">FA §12.3(b)–(c)</span></p>
       </div>
     </div>
     <div class="step">
       <span class="no">5</span>
       <div>
-        <h3>The earnout pays itself from the same stream</h3>
-        <p>Seller price = cash + earnout, and the earnout is collected out of royalties the seller's own <b>audited FY2023–2025 statements</b> already prove. The Garts fund the provable part; performance funds the rest.</p>
-        <div class="cites"><span class="cite">Item 21 / Exhibit B</span><span class="cite">Item 20</span></div>
+        <h3>The earnout pays itself</h3>
+        <p>Collected from the royalty stream the seller's own audits prove — the Garts fund the provable part; performance funds the rest. <span class="cite">Item 21 / Exhibit B</span></p>
       </div>
     </div>
   </div>
 
-  <p class="sec">Why the brand is safe to buy</p>
-  <div class="plain">
-    <p>"Board &amp; Brew" is federally registered and <b>incontestable</b> (reg. 5443521; §8/§15 declaration accepted October 2023). The marks are owned by affiliate JJ&amp;N and licensed to BBRG <b>royalty-free and exclusively</b>, for 10-year terms renewable <b>at BBRG's option</b>, with "no significant limitations" disclosed. Because this is an equity purchase, the licensee entity never changes — on the disclosed terms, the license rides through the closing. <span class="cite">Item 13</span> <span class="cite">Item 1</span></p>
-  </div>
-
-  <p class="sec">The two conditions · say them out loud</p>
-  <div class="plain cond">
-    <span class="k">Condition 1 · Two documents are not in the FDD</span>
-    <p>The FDD attaches only the Franchise Agreement and the ADA — <b>not the BBRG operating agreement and not the JJ&amp;N trademark license</b>. The OA decides which closing structure we use; the license's change-of-control clause is the last open brand question. Funding closes after both are read — that's a condition, not a caveat. <span class="cite">Item 22</span></p>
-  </div>
-  <div class="plain cond">
-    <span class="k">Condition 2 · No performance representations</span>
-    <p>BBRG makes <b>no Item 19 representations</b> about store sales or profits — so unit economics come from the audited Exhibit B statements and store-level records in diligence, not from the FDD. We underwrite what we can verify, which is exactly how the Garts should want it. <span class="cite">Item 19</span> <span class="cite">Item 21</span></p>
-  </div>
-  <div class="plain cond">
-    <span class="k">Condition 3 · The 4% lock and the raise date</span>
-    <p>Some early franchisees signed agreements locking royalty at 4%. That lock is absolute mid-term — no one raises a rate inside a running contract — but it is <b>never perpetual</b>: it ends at the store's next renewal (if its FA renews onto the then-current form) or at final expiry (if it promises renewal on the same terms). California adds two costs to playing hardball: <b>180 days' notice</b> to decline a renewal, and a potential obligation to <b>buy the store's assets</b> if we refuse to renew — so the plan is the calendar, not the hammer. Per-store raise dates come from reading each legacy FA's renewal clause: pull-item one. <span class="cite">FA §5.2(c)(vii), (d)</span> <span class="cite">CA FDD Addendum ¶1</span> <span class="cite">CA FA Addendum ¶3</span></p>
-  </div>
-
-  <p class="sec">Two leaks, already locked</p>
-  <div class="plain lock">
-    <span class="k">Lock 1 · The 99% store sale</span>
-    <p>A franchisee might sell 99% of their entity and argue the match right never triggered (the FDD's own summary invites the reading). It can't happen quietly: <b>any equity transfer — controlling or not — needs our prior written consent</b> with full deal papers up front, and an unapproved transfer is void and grounds for immediate termination. Permanent fix ships with renewals: the next form FA hangs the match right on any change of control. <span class="cite">FA §12.2(a)–(b), (e)</span> <span class="cite">Item 17(n)</span></p>
-  </div>
-  <div class="plain lock">
-    <span class="k">Lock 2 · The minorities shopping our offer</span>
-    <p>Bret &amp; Mike (45%, and Managers) could take our blended offer to market as a price floor. Sequencing kills it: <b>Close 1 first</b> — Tom's 55% + JJ&amp;N + the license — so any rival is bidding on a minority stake in a company we already control, while their two stores can't be sold past our 15-day match right. The offer itself goes out under NDA, no-shop, short fuse, non-assignable. <span class="cite">FA §12.3</span> <span class="cite">Item 2</span> <span class="cite">Item 1</span></p>
-  </div>
-
-  <p class="foot">Sources: BBRG, LLC Franchise Disclosure Document, issuance date February 10, 2026 (153 pp.), including the form Franchise Agreement (Exhibit A-1). Item cites are to that document; §-cites are to the form FA. Companion detail: the full decision map with per-gate diligence notes.</p>
+  <p class="foot">Sources: BBRG, LLC Franchise Disclosure Document, issuance date February 10, 2026 (153 pp.), including the form Franchise Agreement (Exhibit A-1) and audited financial statements FY2023–2025 (Exhibit B). Two housekeeping items we raise before they're asked: the audit's Note 1 counts 27 franchised outlets at 12/31/25 against Item 20's 26 — reconcile with the seller; and FY25 other income includes a $296K vendor rebate (~11% of pre-tax income) and a $41.8K legal settlement — we price the deal off royalties and treat both as found money pending explanation. California note: declining a renewal takes 180 days' notice and can trigger an asset-buyback duty, so the step-up plan is the calendar, not the hammer.</p>
 </div>
 </body>
 </html>
