@@ -19,7 +19,9 @@ flowchart LR
 
     DOCS --> LIC{"Marks securable?<br/><i>JJ&amp;N sale, or license papered<br/>perpetual + CoC-proof</i>"}
     LIC -- "No" --> W2(["WALK<br/>never BBRG<br/>without marks"])
-    LIC -- "Yes — each store's mark rights<br/>confirmed per its FA" --> OA{"<b>OA: drag-along?</b><br/>THE fork — sets<br/>closing structure"}
+    LIC -- "Yes — mark rights confirmed<br/>per each store's FA<br/>(expired FAs re-papered)" --> CLIFF{"<b>RENEWAL CLIFF</b><br/>expired + expiring FAs<br/>re-papered at closing?"}
+    CLIFF -- "papered: covenant from letter date,<br/>condition precedent at closing" --> OA{"<b>OA: drag-along?</b><br/>THE fork — sets<br/>closing structure"}
+    CLIFF -- "unpapered stores:<br/>price adjusts by formula<br/>or specific indemnity" --> OA
 
     OA -- "Drag exists · ideal" --> A4["<b>ONE SIGNING</b><br/>Tom + JJ&amp;N + partners<br/>same price, same day"] --> A5["Renewal calendar<br/>store buys, real estate"] --> A6(["<b>OUTCOME</b><br/>100% day one<br/>step ups at renewals"])
 
@@ -40,7 +42,7 @@ flowchart LR
     classDef walk fill:#F6E3E0,stroke:#8E2C25,color:#5A1712,stroke-width:1.5px
 
     class START start
-    class P,LIC,OA,B5 gate
+    class P,LIC,CLIFF,OA,B5 gate
     class DOCS,A4,B3,C4 action
     class A5,B4,B6,B7,C5 step
     class A6,B8,C6 outcome
