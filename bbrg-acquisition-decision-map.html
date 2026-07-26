@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BBRG Acquisition — Decision Map</title>
+</head>
+<body>
+<style>
+  :root{
+    --paper:#F4F3EF;
+    --card:#FDFDFB;
+    --ink:#23272E;
+    --muted:#6E6A61;
+    --line:#DCD8CE;
+    --line-soft:#E7E4DC;
+
+    --gate-fg:#8A6420;  --gate-bg:#F4EAD3;  --gate-ink:#4A3510;
+    --act-fg:#2E5C7E;   --act-bg:#E3EDF5;   --act-ink:#17364E;
+    --win-fg:#1F6B47;   --win-bg:#E1EFE7;   --win-ink:#123A28;
+    --walk-fg:#8E2C25;  --walk-bg:#F6E3E0;  --walk-ink:#5A1712;
+
+    --display:"Charter","Bitstream Charter","Sitka Text",Cambria,Georgia,serif;
+    --body:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#17191D; --card:#1F2226; --ink:#E9E7E1; --muted:#9A968C;
+      --line:#34383F; --line-soft:#2A2E34;
+      --gate-fg:#D6A84F; --gate-bg:#2C2416; --gate-ink:#EBD9AE;
+      --act-fg:#7FB0D6;  --act-bg:#1B2A38;  --act-ink:#C4DCEE;
+      --win-fg:#6CC49A;  --win-bg:#16301F;  --win-ink:#BCE4CE;
+      --walk-fg:#E08A80; --walk-bg:#37201D; --walk-ink:#F0C6C0;
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#F4F3EF; --card:#FDFDFB; --ink:#23272E; --muted:#6E6A61;
+    --line:#DCD8CE; --line-soft:#E7E4DC;
+    --gate-fg:#8A6420; --gate-bg:#F4EAD3; --gate-ink:#4A3510;
+    --act-fg:#2E5C7E;  --act-bg:#E3EDF5;  --act-ink:#17364E;
+    --win-fg:#1F6B47;  --win-bg:#E1EFE7;  --win-ink:#123A28;
+    --walk-fg:#8E2C25; --walk-bg:#F6E3E0; --walk-ink:#5A1712;
+  }
+  :root[data-theme="dark"]{
+    --paper:#17191D; --card:#1F2226; --ink:#E9E7E1; --muted:#9A968C;
+    --line:#34383F; --line-soft:#2A2E34;
+    --gate-fg:#D6A84F; --gate-bg:#2C2416; --gate-ink:#EBD9AE;
+    --act-fg:#7FB0D6;  --act-bg:#1B2A38;  --act-ink:#C4DCEE;
+    --win-fg:#6CC49A;  --win-bg:#16301F;  --win-ink:#BCE4CE;
+    --walk-fg:#E08A80; --walk-bg:#37201D; --walk-ink:#F0C6C0;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:56px 20px 72px;
+  }
+  a{color:inherit}
+
+  .wrap{max-width:1120px;margin:0 auto}
+  .col{max-width:680px;margin:0 auto}
+
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 14px;
+  }
+  h1{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(28px,4.5vw,38px);
+    line-height:1.15;
+    letter-spacing:-.01em;
+    margin:0 0 14px;
+    text-wrap:balance;
+  }
+  .lede{
+    font-size:16px;
+    color:var(--muted);
+    max-width:58ch;
+    margin:0 0 52px;
+  }
+  .lede b{color:var(--ink);font-weight:600}
+
+  /* ---------- gate spine ---------- */
+  .spine{display:flex;flex-direction:column}
+  .row{display:grid;grid-template-columns:44px 1fr;column-gap:16px}
+  .rail{display:flex;flex-direction:column;align-items:center}
+  .dot{
+    flex:none;width:12px;height:12px;border-radius:50%;
+    border:2px solid var(--muted);background:var(--paper);margin-top:22px;
+  }
+  .row.is-gate .dot{border-color:var(--gate-fg);background:var(--gate-bg)}
+  .row.is-act  .dot{border-color:var(--act-fg); background:var(--act-bg)}
+  .row.is-start .dot{border-color:var(--ink);background:var(--ink)}
+  .stem{flex:1;width:2px;background:var(--line);margin-top:6px}
+  .row:last-child .stem{display:none}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:20px 24px 22px;
+    margin-bottom:14px;
+  }
+  .yes-link{
+    grid-column:2;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    padding:2px 0 16px 24px;
+  }
+
+  .tag{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    margin:0 0 10px;
+    color:var(--muted);
+  }
+  .tag.bronze{color:var(--gate-fg)}
+  .tag.steel{color:var(--act-fg)}
+  .card h2{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:20px;
+    line-height:1.3;
+    margin:0;
+    text-wrap:balance;
+  }
+  .card .note{color:var(--muted);font-size:14px;margin:8px 0 0;max-width:56ch}
+
+  .card.start{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .card.start .tag{color:color-mix(in srgb, var(--paper) 70%, var(--ink))}
+  .card.start h2{font-size:18px}
+
+  .answers{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+  .ans{
+    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+    border-radius:4px;padding:10px 14px;font-size:14px;
+  }
+  .ans .k{
+    font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;flex:none;width:34px;font-weight:600;
+  }
+  .ans.no{background:var(--walk-bg);color:var(--walk-ink);border-left:3px solid var(--walk-fg)}
+  .ans.no .k{color:var(--walk-fg)}
+  .ans.yes{background:var(--line-soft);border-left:3px solid var(--muted)}
+  .ans.yes .k{color:var(--muted)}
+  .verdict{
+    margin-left:auto;flex:none;
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;
+    color:var(--walk-fg);
+  }
+
+  .docs{
+    margin:14px 0 0;padding:0;list-style:none;
+    display:flex;flex-direction:column;
+    counter-reset:doc;
+  }
+  .docs li{
+    counter-increment:doc;
+    display:flex;align-items:baseline;gap:14px;
+    padding:9px 2px;font-size:14.5px;
+    border-top:1px solid var(--line-soft);
+  }
+  .docs li::before{
+    content:counter(doc,decimal-leading-zero);
+    font-family:var(--mono);font-size:11px;color:var(--act-fg);
+    letter-spacing:.08em;flex:none;
+  }
+
+  /* the OA fork chips */
+  .forks{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+  .fork{
+    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+    text-decoration:none;
+    background:var(--gate-bg);color:var(--gate-ink);
+    border-left:3px solid var(--gate-fg);
+    border-radius:4px;padding:10px 14px;font-size:14px;
+    transition:filter .12s ease;
+  }
+  .fork:hover{filter:brightness(.97)}
+  .fork:focus-visible{outline:2px solid var(--gate-fg);outline-offset:2px}
+  .fork b{font-weight:600}
+  .fork .goto{
+    margin-left:auto;flex:none;
+    font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--gate-fg);
+  }
+
+  /* ---------- tracks ---------- */
+  .tracks-head{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);
+    margin:44px 0 16px;display:flex;align-items:center;gap:14px;
+  }
+  .tracks-head::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .tracks{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+  .track{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-top:3px solid var(--gate-fg);
+    border-radius:6px;
+    padding:20px 20px 20px;
+    display:flex;flex-direction:column;
+    scroll-margin-top:24px;
+  }
+  .track-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px}
+  .cond{
+    font-family:var(--display);font-weight:600;font-size:17px;
+    line-height:1.25;margin:0;text-wrap:balance;
+  }
+  .badge{
+    flex:none;
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;
+    padding:4px 8px;border-radius:3px;
+  }
+  .badge.ideal{background:var(--win-bg);color:var(--win-fg)}
+  .badge.base{background:var(--line-soft);color:var(--muted)}
+  .badge.hard{background:var(--walk-bg);color:var(--walk-fg)}
+  .track .sub{font-size:13px;color:var(--muted);margin:0 0 18px}
+
+  .steps{list-style:none;margin:0 0 20px;padding:0;flex:1}
+  .steps li{
+    position:relative;
+    padding:0 0 18px 24px;
+    font-size:14px;color:var(--muted);
+  }
+  .steps li b{display:block;color:var(--ink);font-weight:600;font-size:14.5px;margin-bottom:2px}
+  .steps li::before{
+    content:"";position:absolute;left:3px;top:6px;
+    width:8px;height:8px;border-radius:50%;
+    border:2px solid var(--act-fg);background:var(--card);
+  }
+  .steps li::after{
+    content:"";position:absolute;left:8px;top:20px;bottom:2px;
+    width:2px;background:var(--line-soft);
+  }
+  .steps li:last-child{padding-bottom:0}
+  .steps li:last-child::after{display:none}
+
+  .opts{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+  .opt{
+    border-radius:4px;padding:8px 12px;font-size:13px;
+    background:var(--line-soft);color:var(--ink);
+  }
+  .opt .k{
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.13em;text-transform:uppercase;
+    display:block;margin-bottom:1px;color:var(--muted);
+  }
+  .opt.wait{background:var(--gate-bg);color:var(--gate-ink)}
+  .opt.wait .k{color:var(--gate-fg)}
+
+  .outcome{
+    background:var(--win-bg);color:var(--win-ink);
+    border-left:3px solid var(--win-fg);
+    border-radius:4px;padding:12px 14px;
+    font-size:14px;line-height:1.45;
+  }
+  .outcome .k{
+    display:block;
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;
+    color:var(--win-fg);margin-bottom:3px;
+  }
+  .outcome b{font-weight:600}
+
+  .foot{
+    max-width:680px;margin:44px auto 0;
+    padding-top:18px;border-top:1px solid var(--line);
+    font-size:13.5px;color:var(--muted);
+  }
+
+  @media (max-width:880px){
+    .tracks{grid-template-columns:1fr}
+    body{padding-top:36px}
+  }
+  @media (max-width:520px){
+    .row{grid-template-columns:1fr}
+    .rail{display:none}
+    .yes-link{grid-column:1;padding-left:2px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .fork{transition:none}
+  }
+</style>
+
+<div class="wrap">
+  <div class="col">
+    <header>
+      <p class="eyebrow">Deal playbook · BBRG franchise platform</p>
+      <h1>The BBRG acquisition, as three gates and one fork</h1>
+      <p class="lede">Gart's letter of credit is issued and Tom has been pitched. From here the deal passes through three gates — economics, trademarks, then the operating agreement. <b>The OA answer, not the price, sets the closing structure.</b></p>
+    </header>
+
+    <div class="spine">
+      <div class="row is-start">
+        <div class="rail"><span class="dot"></span><span class="stem"></span></div>
+        <article class="card start">
+          <p class="tag">Start</p>
+          <h2>Gart LC issued · Tom pitched</h2>
+        </article>
+      </div>
+
+      <div class="row is-gate">
+        <div class="rail"><span class="dot"></span><span class="stem"></span></div>
+        <article class="card">
+          <p class="tag bronze">Gate 1 · Economics</p>
+          <h2>Does Tom take the buyer's case — price plus earnout?</h2>
+          <div class="answers">
+            <div class="ans no"><span class="k">No</span> He holds out for cash-only at $20M+ <span class="verdict">Walk</span></div>
+            <div class="ans yes"><span class="k">Yes</span> Continue — but pull the paper before anything else moves</div>
+          </div>
+        </article>
+      </div>
+
+      <div class="row is-act">
+        <div class="rail"><span class="dot"></span><span class="stem"></span></div>
+        <article class="card">
+          <p class="tag steel">Before diligence goes further</p>
+          <h2>Tom pulls three documents first</h2>
+          <ol class="docs">
+            <li>BBRG operating agreement</li>
+            <li>JJ&amp;N–BBRG trademark license</li>
+            <li>Franchise agreements + renewal files</li>
+          </ol>
+        </article>
+      </div>
+
+      <div class="row is-gate">
+        <div class="rail"><span class="dot"></span><span class="stem"></span></div>
+        <article class="card">
+          <p class="tag bronze">Gate 2 · Trademarks</p>
+          <h2>Are the marks securable?</h2>
+          <p class="note">Either JJ&amp;N sells the marks outright, or the license is re-papered perpetual and change-of-control-proof.</p>
+          <div class="answers">
+            <div class="ans no"><span class="k">No</span> Never buy BBRG without the marks <span class="verdict">Walk</span></div>
+            <div class="ans yes"><span class="k">Yes</span> Confirm each store's mark rights against its own franchise agreement, then move to the OA</div>
+          </div>
+        </article>
+      </div>
+
+      <div class="row is-gate">
+        <div class="rail"><span class="dot"></span></div>
+        <article class="card">
+          <p class="tag bronze">Gate 3 · Operating agreement — the fork</p>
+          <h2>Does the OA carry a drag-along?</h2>
+          <p class="note">Every answer reaches the same platform. What changes is how many closings it takes, and how long the minority partners can make you wait.</p>
+          <div class="forks">
+            <a class="fork" href="#track-a"><b>Drag exists</b> — one signing takes everything <span class="goto">Track A · ideal</span></a>
+            <a class="fork" href="#track-b"><b>No drag, no block</b> — control first, minority later <span class="goto">Track B · base</span></a>
+            <a class="fork" href="#track-c"><b>Transfers blocked / ROFR</b> — everyone or no one <span class="goto">Track C · hard</span></a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <p class="tracks-head">The three closing structures</p>
+
+  <div class="tracks">
+    <article class="track" id="track-a">
+      <div class="track-head">
+        <p class="cond">Drag-along exists</p>
+        <span class="badge ideal">Ideal</span>
+      </div>
+      <p class="sub">The OA lets the majority pull everyone into one deal.</p>
+      <ol class="steps">
+        <li><b>One signing</b>Tom, JJ&amp;N, and the partners — same price, same day.</li>
+        <li><b>Run the platform</b>Renewal calendar, store buys, real estate.</li>
+      </ol>
+      <div class="outcome"><span class="k">Outcome</span><b>100% on day one.</b> Royalty steps 4% → 5% over ten years.</div>
+    </article>
+
+    <article class="track" id="track-b">
+      <div class="track-head">
+        <p class="cond">No drag, no block</p>
+        <span class="badge base">Base case</span>
+      </div>
+      <p class="sub">Control transfers freely; the minority comes in on its own clock.</p>
+      <ol class="steps">
+        <li><b>Close 1</b>Tom's 55%, JJ&amp;N, and the license — together.</li>
+        <li><b>Blended offer to the partners</b>Their 45%, plus their two stores.</li>
+        <li><b>Do they accept?</b>
+          <div class="opts">
+            <div class="opt"><span class="k">Accept</span>Straight into the platform work.</div>
+            <div class="opt wait"><span class="k">Hold out</span>Patience — the first partner to sell wins.</div>
+          </div>
+        </li>
+        <li><b>Run the platform</b>Renewal calendar, store buys, real estate.</li>
+      </ol>
+      <div class="outcome"><span class="k">Outcome</span><b>Same platform,</b> 6–18 months slower.</div>
+    </article>
+
+    <article class="track" id="track-c">
+      <div class="track-head">
+        <p class="cond">Transfers blocked / ROFR</p>
+        <span class="badge hard">Hard</span>
+      </div>
+      <p class="sub">No partial path — the OA forces a single, simultaneous deal.</p>
+      <ol class="steps">
+        <li><b>Five-party close</b>Bret &amp; Mike brought in early; everyone signs the same day.</li>
+        <li><b>Run the platform</b>Renewal calendar, store buys, real estate.</li>
+      </ol>
+      <div class="outcome"><span class="k">Outcome</span><b>Same platform,</b> on an all-or-nothing closing day.</div>
+    </article>
+  </div>
+
+  <p class="foot">Every track ends in the same three moves — renewal calendar, store buys, real estate. The operating agreement never changes where the deal lands; it only decides how many closings it takes to get there.</p>
+</div>
+</body>
+</html>
