@@ -26,12 +26,12 @@
   html,body{margin:0}
   body{background:var(--paper); color:var(--ink); font-family:var(--body);
     font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased; padding:52px 24px 64px;}
-  .wrap{max-width:740px;margin:0 auto}
+  .wrap{max-width:760px;margin:0 auto}
   .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.14em;
     text-transform:uppercase; color:var(--muted); margin:0 0 12px;}
   h1{font-family:var(--display); font-weight:600; font-size:clamp(26px,4.5vw,33px);
     line-height:1.15; letter-spacing:-.01em; margin:0 0 14px; text-wrap:balance;}
-  .lede{font-size:16px; color:var(--muted); max-width:62ch; margin:0 0 26px}
+  .lede{font-size:16px; color:var(--muted); max-width:64ch; margin:0 0 26px}
   .lede b{color:var(--ink); font-weight:600}
   .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
     background:var(--line); border:1px solid var(--line); border-radius:6px;
@@ -45,9 +45,34 @@
     text-transform:uppercase; color:var(--muted); margin:34px 0 12px;
     display:flex; align-items:center; gap:14px;}
   .sec::after{content:""; flex:1; height:1px; background:var(--line)}
-  p{margin:0 0 12px; max-width:68ch}
+  p{margin:0 0 12px; max-width:70ch}
   p b{color:var(--ink); font-weight:600}
   .body{color:var(--muted)}
+
+  .pillars{display:flex; flex-direction:column; gap:12px; margin:4px 0 6px}
+  .pillar{background:var(--card); border:1px solid var(--line);
+    border-left:3px solid var(--act-fg); border-radius:6px; padding:15px 17px;}
+  .pillar:nth-child(2){border-left-color:var(--win-fg)}
+  .pillar:nth-child(3){border-left-color:var(--gate-fg)}
+  .pillar .k{font-family:var(--mono); font-size:10px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--act-fg);
+    display:block; margin-bottom:5px;}
+  .pillar:nth-child(2) .k{color:var(--win-fg)}
+  .pillar:nth-child(3) .k{color:var(--gate-fg)}
+  .pillar h3{font-family:var(--display); font-weight:600; font-size:16.5px;
+    margin:0 0 6px; line-height:1.3}
+  .pillar p{margin:0 0 8px; font-size:13.5px; color:var(--muted); max-width:64ch}
+  .pillar p:last-child{margin-bottom:0}
+
+  table{border-collapse:collapse; width:100%; margin:6px 0 10px; font-size:13.5px}
+  th{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted); text-align:left; font-weight:400; padding:0 10px 7px 0;
+    border-bottom:1px solid var(--line);}
+  td{padding:8px 10px 8px 0; border-bottom:1px solid var(--line-soft); color:var(--muted);
+    vertical-align:top; font-variant-numeric:tabular-nums;}
+  td.lbl{color:var(--ink); font-weight:600}
+  .tnote{font-size:12px; color:var(--muted); margin:0 0 14px}
+
   .fall{display:flex; flex-direction:column}
   .step{display:grid; grid-template-columns:44px 1fr; gap:0 14px;
     padding:12px 0 13px; border-top:1px solid var(--line-soft);}
@@ -57,7 +82,7 @@
   .step.win .no{color:var(--win-fg)}
   .step h3{font-family:var(--display); font-weight:600; font-size:15.5px;
     line-height:1.3; margin:0 0 3px}
-  .step p{margin:0; font-size:13.5px; color:var(--muted); max-width:62ch}
+  .step p{margin:0; font-size:13.5px; color:var(--muted); max-width:64ch}
   .step p b{color:var(--ink)}
   .foot{margin:36px 0 0; padding-top:15px; border-top:1px solid var(--line);
     font-size:12.5px; color:var(--muted);}
@@ -69,21 +94,51 @@
 
 <div class="wrap">
   <p class="eyebrow">Executive summary · Board &amp; Brew (BBRG, LLC)</p>
-  <h1>Board &amp; Brew: a founder led succession in a franchise system the stores already carry</h1>
-  <p class="lede"><b>Store operations are solid. The corporate layer is not maximizing the brand.</b> Thirty three restaurants sold $21.2M in the first quarter of 2026, up 10.7% comparable and led by traffic, while roughly $700K of overhead runs the entire franchisor. The founder wants a succession. The plan buys control of the franchisor and the trademarks, then builds the corporate layer to the standard of the stores it serves.</p>
+  <h1>A proven operating platform, underwritten by an annuity like royalty stream</h1>
+  <p class="lede"><b>This is not the purchase of a franchise company.</b> It is control of a 46 year old Southern California restaurant brand whose 33 locations sold $21.2M in the first quarter of 2026, up 10.7% comparable and led by traffic, with average unit volumes of $2.62M. Beneath it sits a contracted royalty stream that requires no capital, carries no debt, and produces $2.6M of net income a year. That stream pays for the transaction and funds the build. The equity is created above it, in company operated restaurants and the real estate under them.</p>
 
   <div class="stats">
-    <div class="stat"><span class="n">$2.61M</span><span class="l">FY25 net income</span></div>
-    <div class="stat"><span class="n">$2.76M</span><span class="l">FY25 royalties · +16%</span></div>
+    <div class="stat"><span class="n">$2.62M</span><span class="l">Average unit volume</span></div>
+    <div class="stat"><span class="n">$2.61M</span><span class="l">FY25 franchisor net income</span></div>
     <div class="stat"><span class="n">+10.7%</span><span class="l">Q1 2026 comp sales</span></div>
-    <div class="stat"><span class="n">4.5x</span><span class="l">Firm money on earnings</span></div>
+    <div class="stat"><span class="n">Zero</span><span class="l">Debt on the business</span></div>
   </div>
 
-  <p class="sec">The asset</p>
-  <p class="body">Board &amp; Brew has operated in Southern California since 1979. The purchase is the franchise system: 26 franchise agreements paying roughly 5% of every store's sales, collected weekly, plus a 1% brand fund, plus the trademarks behind them. FY25 revenue was $3.0M against about $700K of operating expense, with $2.6M of operating cash flow and no debt. About 89 cents of every incremental royalty dollar reaches operating income. Three parties own the pieces: the founder holds 55% of the franchisor and 100% of the entity that owns the marks; two partners hold the other 45%. Seven restaurants sit outside the franchisor in the principals' own entities and pay no royalty.</p>
+  <p class="sec">Three pillars</p>
+  <div class="pillars">
+    <div class="pillar">
+      <span class="k">Pillar one · the cash shield</span>
+      <h3>The franchise base is a zero capital cash engine</h3>
+      <p>Twenty six franchise agreements pay roughly 5% of gross sales, collected every Wednesday, against about $700K of total operating expense. FY25: $3.0M of revenue, <b>$2.61M of net income, $2.6M of operating cash flow, no debt.</b> About 89 cents of every incremental royalty dollar reaches operating income.</p>
+      <p>That stream services acquisition debt, carries corporate overhead, and funds expansion out of operations. Most restaurant rollouts fail because they have no base cash flow and must raise equity for every unit. <b>This one starts with $2.6M a year of it, and the stores generating it are already growing at double digits without us.</b></p>
+    </div>
+    <div class="pillar">
+      <span class="k">Pillar two · the equity compounder</span>
+      <h3>Company operated stores capture the whole economics</h3>
+      <p>A franchised store at the system average pays about $131K of royalty a year. <b>The same store operated by the platform produces roughly $470K of store level EBITDA.</b> Four times the cash per unit, on about $1.1M of build out, a yield on cost in the mid thirties.</p>
+      <p>This is where enterprise value is created rather than collected. Royalty income is worth a franchisor multiple; store EBITDA is worth a restaurant multiple on a much larger number, and the two together compound faster than either alone. Growth is funded by the cash shield instead of by dilution.</p>
+    </div>
+    <div class="pillar">
+      <span class="k">Pillar three · hard asset backing</span>
+      <h3>Owning the real estate under the flagships</h3>
+      <p>The franchisor today owns nothing. A platform that acquires the property under its own restaurants earns rent alongside royalty, finances it against long leases, depreciates it against operating income, and <b>controls the locations permanently.</b></p>
+      <p>It also changes what the investment is. Instead of paper claims on other people's businesses, the balance sheet carries appraisable property, financeable at attractive rates, producing <b>distributions sheltered by depreciation.</b> A platform holding royalty, operations, and real estate sells into a materially different buyer pool than an asset light franchisor.</p>
+    </div>
+  </div>
 
-  <p class="sec">The opportunity</p>
-  <p class="body">The stores are performing and the franchisor is not capturing it. Renewal paper sits behind the calendar, the largest franchisee holds 11 of the 26 agreements and roughly half the royalty line, the development pipeline is unworked, and nobody has been hired to run any of it. None of this is a turnaround. It is a job that was never staffed, in a company with no debt, no outside capital, and no forcing function. The Q1 pace annualizes to roughly $85M of system sales, which at the current rate implies royalties near $3.4M against the $2.76M base before any corporate action at all.</p>
+  <p class="sec">The unit math</p>
+  <table>
+    <tr><th>Per store, at the system average volume</th><th>Franchised</th><th>Company operated</th></tr>
+    <tr><td class="lbl">Annual sales</td><td>$2.62M</td><td>$2.62M</td></tr>
+    <tr><td class="lbl">Cash to the platform</td><td>$131K royalty</td><td>About $470K store EBITDA</td></tr>
+    <tr><td class="lbl">Capital required</td><td>None</td><td>About $1.1M build out</td></tr>
+    <tr><td class="lbl">Plus the property</td><td>Not available</td><td>Rent and appreciation</td></tr>
+  </table>
+  <p class="tnote">Royalty figures are computed from the seller's audited FY25 statements and the Q1 2026 sales report. Store level EBITDA is an industry range for a counter service brand at this volume and is confirmed store by store in diligence against actual profit and loss statements, which the bottom up audit collects.</p>
+
+  <p class="sec">Sequencing · prove it where the brand is strongest, then export</p>
+  <p class="body">The brand's power is concentrated in Southern California, where volumes run $2.6M and above and the name does the marketing. The single existing out of market location runs roughly 30% below the system average, which is one data point and the only one there is. <b>The disciplined path builds the first company operated units and the first property acquisitions inside the proven trade area</b>, on sites the platform already knows through its own franchisees, then exports the model to markets where Gart brings real estate relationships and operating presence. Out of market expansion is phase two and is capitalized separately, on results rather than on enthusiasm.</p>
+  <p class="body"><b>The founder's original restaurant is where the model gets proven publicly.</b> The platform acquires the property at appraised value; the founder and his son keep the operating business under a current form franchise agreement and a market rate lease. He converts trapped equity into platform units, keeps the restaurant his family built, and his son runs it. Every other franchisee then sees a template rather than a proposal: <b>sell the building, keep the business.</b> For an operator whose net worth sits in a retail pad, that is liquidity without loss of control, from a landlord whose only interest is the store succeeding. The same structure removes the largest barrier to new units, because a platform that takes the site and subleases to the operator lets good operators open without buying land.</p>
 
   <p class="sec">The transaction</p>
   <div class="fall">
@@ -91,36 +146,34 @@
       <span class="no">1</span>
       <div>
         <h3>The founder is paid $20M, structured</h3>
-        <p><b>$4M to $5M wired at closing</b>, a $6M to $7M installment note, and an $8M to $10M founder's royalty paid from growth above the FY25 base. He keeps his original restaurant, takes an advisory role, and rolls the trademark entity into holdco equity tax deferred.</p>
+        <p><b>$4M to $5M wired at closing</b>, a $6M to $7M installment note, and an $8M to $10M founder's royalty paid from growth above the FY25 base. He rolls the trademark entity into platform equity tax deferred and stays as an advisor through the succession.</p>
       </div>
     </div>
     <div class="step">
       <span class="no">2</span>
       <div>
         <h3>Two findings decide the deal</h3>
-        <p>The operating agreement must put control with the founder's 55%, by drag along or majority manager rights. The largest franchisee must sign current form agreements. Both are answered in week two, before heavy spending, and the earnout is built so the founder delivers the second.</p>
+        <p>The operating agreement must put control with the founder's 55%, by drag along or majority manager rights. The largest franchisee, holding 11 of the 26 agreements and roughly half the royalty line, must sign current form agreements. Both are answered in week two, before heavy spending.</p>
       </div>
     </div>
     <div class="step">
       <span class="no">3</span>
       <div>
         <h3>Nothing funds partially</h3>
-        <p>Control, the marks, and the partners close cross conditioned. The credit line is never exposed to a half completed structure. If a gate fails, the loss is the diligence budget spent to that point, $150K to $700K.</p>
+        <p>Control, the trademarks, and the partners close cross conditioned. The credit line is never exposed to a half completed structure. If a gate fails, the loss is the diligence budget spent to that point, <b>$150K to $700K.</b></p>
       </div>
     </div>
   </div>
 
-  <p class="sec">The real estate model · the second business inside the first</p>
-  <p class="body">Every Board &amp; Brew occupies a site somebody owns, and the franchisor owns none of them. A holdco that acquires the property under its restaurants collects rent alongside royalty, finances the purchases against long leases, and controls the locations permanently. The economics are franchisor like rather than restaurant like, and a platform holding both the royalty stream and the real estate sells into a different buyer pool than a royalty stream alone.</p>
-  <p class="body"><b>The founder's original store is where the model gets proven.</b> The holdco acquires the property at appraised value; the founder and his son keep the operating business and sign two documents, a current form franchise agreement and a market rate lease. He converts trapped equity into holdco units or cash, keeps the restaurant his family built, and his son runs it. Every other franchisee then sees a template rather than a proposal: <b>sell the building, keep the business.</b> For an operator whose net worth sits in a retail pad, that is liquidity without loss of control, from a landlord whose only interest is the store succeeding.</p>
-  <p class="body">The same structure accelerates new units. Site cost is the largest barrier to opening a store; a holdco that takes the lease or buys the pad and subleases to the operator removes it, and earns rent for doing so. <b>Sizing comes after diligence.</b> Ownership of all 33 sites is public record and gets pulled at no cost, which tells us how many are franchisee owned and reachable. Any purchase from a seller is a related party transaction requiring independent appraisal, arm's length lease terms, and capital approved separately from the acquisition.</p>
+  <p class="sec">Capital, in stages</p>
+  <p class="body"><b>Diligence</b> is $900K to $1.4M across 90 to 120 days, staged behind the week two read. <b>The acquisition</b> is equity plus a modest senior facility against $1.9M of adjusted cash flow, with seller paper carrying the balance and the royalty stream servicing it. <b>The build</b> is authorized separately and only on proof: company operated units at roughly $1.1M each, property acquisitions sized after a public records review of all 33 sites establishes which are reachable. No capital for phase two commits until phase one performs, and every dollar deployed is measured against the cash the shield already produces.</p>
 
   <p class="sec">The ask</p>
   <div class="fall">
     <div class="step win">
       <span class="no">1</span>
       <div><h3>The diligence budget</h3>
-      <p>$900K to $1.4M across 90 to 120 days, itemized, capped, and staged behind the week two read, including an independent quality of earnings.</p></div>
+      <p>$900K to $1.4M, itemized, capped, staged, including an independent quality of earnings and store level profit and loss verification.</p></div>
     </div>
     <div class="step win">
       <span class="no">2</span>
@@ -135,11 +188,11 @@
     <div class="step win">
       <span class="no">4</span>
       <div><h3>The credit line behind the senior facility</h3>
-      <p>Drawn only at a cross conditioned closing that delivers control and the marks together.</p></div>
+      <p>Drawn only at a cross conditioned closing that delivers control and the trademarks together.</p></div>
     </div>
   </div>
 
-  <p class="foot">Every figure above is drawn from the seller's Franchise Disclosure Document dated February 2026, its audited financials for FY2023 through FY2025, and the company's internal Q1 2026 sales report. The full asset summary and acquisition plan, the decision flowchart, and the operator terms accompany this summary.</p>
+  <p class="foot">Every figure above is drawn from the seller's Franchise Disclosure Document dated February 2026, its audited financials for FY2023 through FY2025, and the company's internal Q1 2026 sales report. Store level economics and the per store franchise schedule are confirmed in diligence. The full asset summary and acquisition plan, the decision flowchart, and the operator terms accompany this summary.</p>
 </div>
 </body>
 </html>
