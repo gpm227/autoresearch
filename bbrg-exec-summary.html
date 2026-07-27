@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board &amp; Brew Executive Summary</title>
+<style>
+  :root{
+    --paper:#F4F3EF; --card:#FDFDFB; --ink:#23272E; --muted:#6E6A61;
+    --line:#DCD8CE; --line-soft:#E7E4DC;
+    --gate-fg:#8A6420; --act-fg:#2E5C7E; --win-fg:#1F6B47;
+    --display:"Charter","Bitstream Charter","Sitka Text",Cambria,Georgia,serif;
+    --body:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#17191D; --card:#1F2226; --ink:#E9E7E1; --muted:#9A968C;
+      --line:#34383F; --line-soft:#2A2E34;
+      --gate-fg:#D6A84F; --act-fg:#7FB0D6; --win-fg:#6CC49A; }
+  }
+  :root[data-theme="light"]{ --paper:#F4F3EF; --card:#FDFDFB; --ink:#23272E; --muted:#6E6A61;
+    --line:#DCD8CE; --line-soft:#E7E4DC; --gate-fg:#8A6420; --act-fg:#2E5C7E; --win-fg:#1F6B47; }
+  :root[data-theme="dark"]{ --paper:#17191D; --card:#1F2226; --ink:#E9E7E1; --muted:#9A968C;
+    --line:#34383F; --line-soft:#2A2E34; --gate-fg:#D6A84F; --act-fg:#7FB0D6; --win-fg:#6CC49A; }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper); color:var(--ink); font-family:var(--body);
+    font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased; padding:52px 24px 64px;}
+  .wrap{max-width:740px;margin:0 auto}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted); margin:0 0 12px;}
+  h1{font-family:var(--display); font-weight:600; font-size:clamp(26px,4.5vw,33px);
+    line-height:1.15; letter-spacing:-.01em; margin:0 0 14px; text-wrap:balance;}
+  .lede{font-size:16px; color:var(--muted); max-width:62ch; margin:0 0 26px}
+  .lede b{color:var(--ink); font-weight:600}
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:6px;
+    overflow:hidden; margin:0 0 30px;}
+  .stat{background:var(--card); padding:13px 15px}
+  .stat .n{font-family:var(--display); font-weight:600; font-size:20px;
+    font-variant-numeric:tabular-nums; display:block;}
+  .stat .l{font-family:var(--mono); font-size:10px; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--muted)}
+  .sec{font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted); margin:34px 0 12px;
+    display:flex; align-items:center; gap:14px;}
+  .sec::after{content:""; flex:1; height:1px; background:var(--line)}
+  p{margin:0 0 12px; max-width:68ch}
+  p b{color:var(--ink); font-weight:600}
+  .body{color:var(--muted)}
+  .fall{display:flex; flex-direction:column}
+  .step{display:grid; grid-template-columns:44px 1fr; gap:0 14px;
+    padding:12px 0 13px; border-top:1px solid var(--line-soft);}
+  .step:first-child{border-top:none; padding-top:2px}
+  .step .no{font-family:var(--display); font-weight:600; font-size:21px;
+    color:var(--gate-fg); line-height:1.2; font-variant-numeric:tabular-nums;}
+  .step.win .no{color:var(--win-fg)}
+  .step h3{font-family:var(--display); font-weight:600; font-size:15.5px;
+    line-height:1.3; margin:0 0 3px}
+  .step p{margin:0; font-size:13.5px; color:var(--muted); max-width:62ch}
+  .step p b{color:var(--ink)}
+  .foot{margin:36px 0 0; padding-top:15px; border-top:1px solid var(--line);
+    font-size:12.5px; color:var(--muted);}
+  @media (max-width:640px){ .stats{grid-template-columns:repeat(2,1fr)} body{padding-top:32px} }
+  @media print{ body{padding:0; background:#fff} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <p class="eyebrow">Executive summary · Board &amp; Brew (BBRG, LLC)</p>
+  <h1>Board &amp; Brew: a founder led succession in a franchise system the stores already carry</h1>
+  <p class="lede"><b>Store operations are solid. The corporate layer is not maximizing the brand.</b> Thirty three restaurants sold $21.2M in the first quarter of 2026, up 10.7% comparable and led by traffic, while roughly $700K of overhead runs the entire franchisor. The founder wants a succession. The plan buys control of the franchisor and the trademarks, then builds the corporate layer to the standard of the stores it serves.</p>
+
+  <div class="stats">
+    <div class="stat"><span class="n">$2.61M</span><span class="l">FY25 net income</span></div>
+    <div class="stat"><span class="n">$2.76M</span><span class="l">FY25 royalties · +16%</span></div>
+    <div class="stat"><span class="n">+10.7%</span><span class="l">Q1 2026 comp sales</span></div>
+    <div class="stat"><span class="n">4.5x</span><span class="l">Firm money on earnings</span></div>
+  </div>
+
+  <p class="sec">The asset</p>
+  <p class="body">Board &amp; Brew has operated in Southern California since 1979. The purchase is the franchise system: 26 franchise agreements paying roughly 5% of every store's sales, collected weekly, plus a 1% brand fund, plus the trademarks behind them. FY25 revenue was $3.0M against about $700K of operating expense, with $2.6M of operating cash flow and no debt. About 89 cents of every incremental royalty dollar reaches operating income. Three parties own the pieces: the founder holds 55% of the franchisor and 100% of the entity that owns the marks; two partners hold the other 45%. Seven restaurants sit outside the franchisor in the principals' own entities and pay no royalty.</p>
+
+  <p class="sec">The opportunity</p>
+  <p class="body">The stores are performing and the franchisor is not capturing it. Renewal paper sits behind the calendar, the largest franchisee holds 11 of the 26 agreements and roughly half the royalty line, the development pipeline is unworked, and nobody has been hired to run any of it. None of this is a turnaround. It is a job that was never staffed, in a company with no debt, no outside capital, and no forcing function. The Q1 pace annualizes to roughly $85M of system sales, which at the current rate implies royalties near $3.4M against the $2.76M base before any corporate action at all.</p>
+
+  <p class="sec">The transaction</p>
+  <div class="fall">
+    <div class="step">
+      <span class="no">1</span>
+      <div>
+        <h3>The founder is paid $20M, structured</h3>
+        <p><b>$4M to $5M wired at closing</b>, a $6M to $7M installment note, and an $8M to $10M founder's royalty paid from growth above the FY25 base. He keeps his original restaurant, takes an advisory role, and rolls the trademark entity into holdco equity tax deferred.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="no">2</span>
+      <div>
+        <h3>Two findings decide the deal</h3>
+        <p>The operating agreement must put control with the founder's 55%, by drag along or majority manager rights. The largest franchisee must sign current form agreements. Both are answered in week two, before heavy spending, and the earnout is built so the founder delivers the second.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="no">3</span>
+      <div>
+        <h3>Nothing funds partially</h3>
+        <p>Control, the marks, and the partners close cross conditioned. The credit line is never exposed to a half completed structure. If a gate fails, the loss is the diligence budget spent to that point, $150K to $700K.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="sec">The real estate model · the second business inside the first</p>
+  <p class="body">Every Board &amp; Brew occupies a site somebody owns, and the franchisor owns none of them. A holdco that acquires the property under its restaurants collects rent alongside royalty, finances the purchases against long leases, and controls the locations permanently. The economics are franchisor like rather than restaurant like, and a platform holding both the royalty stream and the real estate sells into a different buyer pool than a royalty stream alone.</p>
+  <p class="body"><b>The founder's original store is where the model gets proven.</b> The holdco acquires the property at appraised value; the founder and his son keep the operating business and sign two documents, a current form franchise agreement and a market rate lease. He converts trapped equity into holdco units or cash, keeps the restaurant his family built, and his son runs it. Every other franchisee then sees a template rather than a proposal: <b>sell the building, keep the business.</b> For an operator whose net worth sits in a retail pad, that is liquidity without loss of control, from a landlord whose only interest is the store succeeding.</p>
+  <p class="body">The same structure accelerates new units. Site cost is the largest barrier to opening a store; a holdco that takes the lease or buys the pad and subleases to the operator removes it, and earns rent for doing so. <b>Sizing comes after diligence.</b> Ownership of all 33 sites is public record and gets pulled at no cost, which tells us how many are franchisee owned and reachable. Any purchase from a seller is a related party transaction requiring independent appraisal, arm's length lease terms, and capital approved separately from the acquisition.</p>
+
+  <p class="sec">The ask</p>
+  <div class="fall">
+    <div class="step win">
+      <span class="no">1</span>
+      <div><h3>The diligence budget</h3>
+      <p>$900K to $1.4M across 90 to 120 days, itemized, capped, and staged behind the week two read, including an independent quality of earnings.</p></div>
+    </div>
+    <div class="step win">
+      <span class="no">2</span>
+      <div><h3>The fee letter</h3>
+      <p>For the deal team, with work fees credited against the closing fee if the transaction funds.</p></div>
+    </div>
+    <div class="step win">
+      <span class="no">3</span>
+      <div><h3>The letter to the founder</h3>
+      <p>The $20M structure, with exclusivity covering his 55% and the trademark entity together. No capital commits until the gates clear.</p></div>
+    </div>
+    <div class="step win">
+      <span class="no">4</span>
+      <div><h3>The credit line behind the senior facility</h3>
+      <p>Drawn only at a cross conditioned closing that delivers control and the marks together.</p></div>
+    </div>
+  </div>
+
+  <p class="foot">Every figure above is drawn from the seller's Franchise Disclosure Document dated February 2026, its audited financials for FY2023 through FY2025, and the company's internal Q1 2026 sales report. The full asset summary and acquisition plan, the decision flowchart, and the operator terms accompany this summary.</p>
+</div>
+</body>
+</html>
