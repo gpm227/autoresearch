@@ -1,0 +1,35 @@
+Address,City,County,Operator/Licensee entity,Known APN,Owner+APN search (Assessor/Tax),Deeds+DeedsOfTrust+Liens search (Recorder),Notes
+1212 Camino Del Mar,Del Mar,San Diego,J J & N ENTERPRISES INC,,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,HQ of JJN + BBRG (Q5 target)
+201 Oak Ave Ste 2,Carlsbad,San Diego,"CCB&B, LLC",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+2681 Gateway Rd Ste 103,Carlsbad,San Diego,TWO RIPPERS LLC,,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+2675 Gateway Rd Ste 103,Carlsbad,San Diego,TWO RIPPERS LLC (CANCEL) / "Coastal Carlsbad",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,EDD-lien trade name
+9880 Hibert St Ste E3,San Diego (Scripps Ranch),San Diego,SRB&B LLC,,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+4516 Mission Blvd Ste D-2,San Diego (Pacific Beach),San Diego,"PBB&B, LLC",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+16480 Paseo Del Sur Ste 135,San Diego (Del Sur),San Diego,"DSB&B, LLC",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+4577 La Jolla Village Dr Ste 1232,San Diego (UTC),San Diego,"UTCB&B, LLC",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+1620 Camino De La Reina Ste B,San Diego (Mission Valley),San Diego,"BLUE OCEAN FOODS, INC.",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+825 N Harbor Dr Ste 109,San Diego,San Diego,"SDB&B, LLC",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,Verify vs Costa Mesa Harbor discrepancy
+2213 S El Camino Real Ste E,Oceanside,San Diego,"OSB&B, LLC",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,PAGA respondent
+1610 Millenia Ave Ste 105,Chula Vista,San Diego,"ELB&B, LLC",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+214 Town Center Pkwy A-2,Santee,San Diego,"BLUE OCEAN FOODS, INC.",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+13501 Poway Rd,Poway,San Diego,POWB&B LLC,,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+1354 W Valley Pkwy Ste B,Escondido,San Diego,"ESCB&B, LLC",,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+119 N El Camino Real Ste A,Encinitas,San Diego,ENCB&B LLC,,https://iwr.sdttc.com/,https://arcc.sdcounty.ca.gov/,
+32371 Golden Lantern Ste E & F,Laguna Niguel,Orange,"LNB&B, LLC",,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,
+27000 Alicia Pkwy Ste B,Laguna Niguel,Orange,"AVB&B, LLC (WTHDRN)",,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,
+25606 Crown Valley Pkwy Ste K 1A,Ladera Ranch,Orange,LADERABNB LLC,,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,Roster typo 5606 vs 25606
+22411 Antonio Pkwy Ste C180,Rancho Santa Margarita,Orange,"RSMBNB, LLC",,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,
+188 S Coast Hwy,Laguna Beach,Orange,"LGNABNB, LLC",,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,
+5643 Alton Pkwy,Irvine,Orange,"OC SANDS, LLC",,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,
+1901 W Imperial Hwy Unit D,La Habra,Orange,"LA HABRA B&B, LLC",,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,
+19720 Beach Blvd Ste 10,Huntington Beach,Orange,unknown operator,,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,Roster-only store
+3030 Harbor Blvd H-1,Costa Mesa,Orange,unknown operator,,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,Roster-only store
+23621 El Toro Rd Ste A,Lake Forest,Orange,unknown operator,,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,Roster-only store
+3305 S Bristol St Unit A,Santa Ana,Orange,unknown operator,,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,Roster-only store
+5253 Katella Ave Ste 100,Cypress,Orange,CYPRESSBNB LLC (Mike Williams),,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,PAGA respondent; roster 5247 vs 5253
+5701 E Santa Ana Canyon Rd,Anaheim,Orange,unknown operator,,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,Newly discovered store
+979 Avenida Pico Unit C,San Clemente,Orange,SCBNB LLC / BBRG mailing,688-131-22,https://tax.ocgov.com/tcweb/search_page.asp,https://cr.ocgov.com/recorderworks/,APN known (Q5 target)
+21211 Hawthorne Blvd Unit A,Torrance,Los Angeles,BB1 LLC,,https://portal.assessor.lacounty.gov/,https://www.lavote.gov/home/county-clerk/property-document-recording,Roster 21221 Ste 140 vs 21211 Unit A
+30734 Russell Ranch Rd Ste D,Thousand Oaks,Ventura,Hubb Management Group LLC (John Hubbard),,https://assessor.countyofventura.org/,https://recorder.countyofventura.org/,
+40335 Winchester Rd Ste K,Temecula,Riverside,AP2 RESTAURANT GROUP LLC,,https://www.asrclkrec.com/,https://www.asrclkrec.com/,Riverside ACR does both owner + recorded docs
+1015 S Rural Rd Ste 105,Tempe,Maricopa (AZ),unknown operator,,https://mcassessor.maricopa.gov/,https://recorder.maricopa.gov/recdocdata/,
